@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة المعلمة – رحلة المبرمجة في قطر</title>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--sea:#0e5f76;--sea2:#0a4557;--sand:#f6e7c8;--sand2:#ecd3a3;--coral:#ff6b4a;--sun:#ffc23d;--ink:#1d2b33;--muted:#5d6f78;--card:#fffaf0;--ok:#1f9d5c;--bad:#d6453a}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Tajawal',sans-serif;color:var(--ink);background:linear-gradient(180deg,var(--sea),var(--sea2));min-height:100vh}
+h1,h2,h3{font-family:'Lalezar',sans-serif;font-weight:400;margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 14px 40px}
+.top{display:flex;justify-content:space-between;align-items:center;color:#fff;flex-wrap:wrap;gap:10px}
+.top h1{font-size:30px}
+.card{background:var(--card);border-radius:20px;padding:16px;margin-top:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.grid{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+textarea{font:inherit;width:100%;min-height:120px;border-radius:14px;border:2px solid var(--sand2);padding:10px;font-size:14px}
+.btn{font:inherit;font-weight:800;font-size:15px;border:0;border-radius:12px;padding:10px 16px;cursor:pointer;background:var(--sea);color:#fff;box-shadow:0 4px 0 var(--sea2)}
+.btn:active{transform:translateY(3px);box-shadow:none}
+.btn.alt{background:#e8e2d4;color:var(--ink);box-shadow:0 4px 0 #c8bfa9}
+.btn.sun{background:var(--sun);color:var(--ink);box-shadow:0 4px 0 #c9921a}
+.btn.red{background:#f6dcd8;color:var(--bad);box-shadow:0 4px 0 #e4b7b0}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{flex:1;min-width:120px;background:#fff;border-radius:16px;padding:10px 14px;text-align:center;border:2px solid var(--sand2)}
+.stat b{display:block;font-family:'Lalezar';font-size:30px;color:var(--sea);line-height:1.1}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{background:var(--sea);color:#fff;padding:10px 8px;text-align:right;position:sticky;top:0}
+th:first-child{border-radius:0 12px 0 0} th:last-child{border-radius:12px 0 0 0}
+td{padding:10px 8px;border-bottom:1px solid #eadfca;vertical-align:top}
+tr:nth-child(even) td{background:#fbf6ea}
+tr.top1 td{background:#fff3c4} tr.top2 td{background:#eef1f4} tr.top3 td{background:#f8e6d6}
+.rank{font-family:'Lalezar';font-size:22px;text-align:center;width:56px}
+.pts{font-family:'Lalezar';font-size:24px;color:var(--coral);white-space:nowrap}
+.name{font-weight:800;font-size:16px;white-space:nowrap}
+.ans{background:#f1ecff;border-radius:10px;padding:6px 9px;font-size:14px;line-height:1.7;min-width:160px}
+.ans.empty{background:none;color:#aaa}
+.bar{height:8px;background:#eadfca;border-radius:99px;overflow:hidden;width:80px;margin-top:4px}
+.bar i{display:block;height:100%;background:var(--ok)}
+.warn{color:var(--bad);font-size:12px;font-weight:700}
+.codes td,.codes th{padding:7px 8px;font-size:14px}
+.codes b{font-family:'Lalezar';font-size:20px;letter-spacing:2px;color:var(--sea)}
+.msg{font-weight:700;min-height:22px}
+.empty-state{text-align:center;color:var(--muted);padding:30px}
+/* podium */
+.pod{position:fixed;inset:0;background:radial-gradient(circle at 50% 30%,#1b7f9a,#0a4557);display:none;z-index:9;color:#fff;text-align:center;padding:24px;overflow:auto}
+.pod.on{display:block}
+.pod h1{font-size:44px;margin-top:10px}
+.stage{display:flex;justify-content:center;align-items:flex-end;gap:14px;margin-top:40px;flex-wrap:wrap}
+.place{width:220px;animation:rise .8s ease both}
+.place .who{font-family:'Lalezar';font-size:30px;margin:6px 0}
+.place .p{font-size:20px;opacity:.9}
+.block{border-radius:16px 16px 0 0;display:grid;place-items:center;font-family:'Lalezar';font-size:56px;color:#1d2b33;margin-top:8px}
+.place.g1 .block{height:220px;background:linear-gradient(#ffd75e,#e8a91c)}
+.place.g2 .block{height:160px;background:linear-gradient(#eef1f4,#b8c2ca)}
+.place.g3 .block{height:120px;background:linear-gradient(#f2c9a5,#c98a54)}
+.place.g1{order:2;animation-delay:.6s}.place.g2{order:1;animation-delay:.3s}.place.g3{order:3}
+.medal{font-size:60px}
+@keyframes rise{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:none}}
+.confetti{position:fixed;top:-10px;font-size:24px;animation:fall 3s linear forwards;z-index:20;pointer-events:none}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1>👩‍🏫 لوحة المعلمة</h1><div style="opacity:.8">رحلة المبرمجة في قطر • خطوات حل المشكلات • الصف التاسع</div></div>
+    <button class="btn sun" style="font-size:18px" onclick="podium()">🏆 شاشة التكريم</button>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3 style="color:var(--sea);font-size:22px">📥 إضافة نتائج يدويًا (احتياطي)</h3>
+      <p style="margin:6px 0;color:var(--muted);line-height:1.7">النتائج تصل تلقائيًا بعد الدخول. إذا انقطع اتصال طالبة، انسخي رسائل الطالبات من محادثة الحصة (رسالة واحدة أو المحادثة كاملة) والصقيها هنا. اللوحة تلتقط النتائج تلقائيًا، وإذا أرسلت الطالبة أكثر من مرة تُحفظ أحدث نتيجة لها.</p>
+      <textarea id="paste" placeholder="الصقي هنا… مثال: سارة | 75 نقطة | 3/4 محطات | #QC:..."></textarea>
+      <div class="row">
+        <button class="btn" onclick="addFromPaste()">➕ إضافة النتائج</button>
+        <span class="msg" id="msg"></span>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--sea);font-size:22px">🔐 دخول المعلمة</h3>
+      <div id="login">
+        <p style="margin:6px 0;color:var(--muted);line-height:1.7">أدخلي رقم المعلمة السري (TEACHER_KEY) لتظهر نتائج الطالبات مباشرة وأرقام السر.</p>
+        <input id="tk" type="password" style="font:inherit;font-size:18px;width:100%;padding:10px;border-radius:12px;border:2px solid var(--sand2);text-align:center" placeholder="الرقم السري للمعلمة" onkeydown="if(event.key==='Enter')login()">
+        <div class="row"><button class="btn" onclick="login()">دخول</button><span class="msg" id="lmsg"></span></div>
+      </div>
+      <div id="logged" style="display:none">
+        <div class="row" style="margin:4px 0 8px;justify-content:space-between"><span id="livestat" style="font-weight:800;color:var(--ok)">🟢 مباشر</span><button class="btn alt" style="padding:6px 12px;font-size:13px" onclick="logout()">خروج</button></div>
+        <h3 style="color:var(--sea);font-size:20px">🔑 أرقام السر</h3>
+        <table class="codes" id="codes"></table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="card" style="overflow-x:auto">
+    <div class="row" style="justify-content:space-between;margin:0 0 10px">
+      <h3 style="color:var(--sea);font-size:22px">📊 ترتيب الطالبات</h3>
+      <div class="row" style="margin:0">
+        <button class="btn alt" onclick="copyTable()">📋 نسخ الجدول (Excel)</button>
+        <button class="btn red" onclick="clearAll(this)">🗑️ مسح الكل</button>
+      </div>
+    </div>
+    <div id="table"></div>
+  </div>
+</div>
+
+<div class="pod" id="pod" onclick="this.classList.remove('on')">
+  <div style="font-size:50px">🏆</div>
+  <h1>بطلات رحلة المبرمجة</h1>
+  <p style="opacity:.85">خطوات حل المشكلات • الحوسبة وتكنولوجيا المعلومات</p>
+  <div class="stage" id="stage"></div>
+  <p style="opacity:.6;margin-top:30px">اضغطي في أي مكان للعودة</p>
+</div>
+
+<script>
+const SALT='qatar-algo-2026',KEY='qc-teacher-board-v1';
+const $=id=>document.getElementById(id);
+function fnv(t){let h=0x811c9dc5;for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h.toString(36)}
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const normName=n=>n.trim().replace(/\s+/g,' ').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي');
+let R={};try{R=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
+let SRV=[],TK='',POLL=null;try{TK=localStorage.getItem('qc-tk')||''}catch(e){}
+async function fetchResults(method){
+  const r=await fetch('/api/results',{method:method||'GET',headers:{'x-teacher-key':TK},cache:'no-store'});
+  let j={};try{j=await r.json()}catch(e){}
+  if(!r.ok)throw new Error(j.error||('HTTP '+r.status));
+  return j;
+}
+async function login(){
+  TK=$('tk').value.trim()||TK;if(!TK)return;
+  $('lmsg').style.color='var(--muted)';$('lmsg').textContent='جارٍ الدخول…';
+  try{
+    const j=await fetchResults();
+    try{localStorage.setItem('qc-tk',TK)}catch(e){}
+    $('login').style.display='none';$('logged').style.display='block';
+    $('codes').innerHTML='<tr><th>الاستخدام</th><th>الرقم</th></tr>'+j.codes.map(c=>`<tr><td>${esc(c[0])}</td><td><b>${esc(c[1])}</b></td></tr>`).join('');
+    SRV=j.results;render();stamp();
+    clearInterval(POLL);POLL=setInterval(poll,5000);
+  }catch(e){
+    const m={WRONG_KEY:'الرقم السري غير صحيح',NO_TEACHER_KEY:'لم يُضبط TEACHER_KEY في Vercel بعد',NO_DB:'لم تُربط قاعدة البيانات (Upstash) في Vercel بعد'}[e.message]||'تعذّر الاتصال بالخادم (تأكدي أن الصفحة مفتوحة من رابط Vercel)';
+    $('lmsg').style.color='var(--bad)';$('lmsg').textContent=m;
+    if(e.message==='WRONG_KEY'){TK='';try{localStorage.removeItem('qc-tk')}catch(x){}}
+  }
+}
+async function poll(){
+  try{const j=await fetchResults();SRV=j.results;render();stamp()}
+  catch(e){$('livestat').style.color='var(--bad)';$('livestat').textContent='🔴 انقطع الاتصال… سأحاول مجددًا'}
+}
+function stamp(){$('livestat').style.color='var(--ok)';$('livestat').textContent='🟢 مباشر • آخر تحديث '+new Date().toLocaleTimeString('ar-QA-u-nu-latn',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+function logout(){clearInterval(POLL);TK='';SRV=[];try{localStorage.removeItem('qc-tk')}catch(e){}$('login').style.display='block';$('logged').style.display='none';$('tk').value='';render()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(R))}catch(e){}}
+
+function decode(b,h){
+  try{
+    let s=b.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';
+    const j=decodeURIComponent(escape(atob(s)));const o=JSON.parse(j);
+    o.ok=fnv(SALT+j)===h;return o;
+  }catch(e){return null}
+}
+function addFromPaste(){
+  const txt=$('paste').value,re=/#QC:([A-Za-z0-9_-]+)\.([a-z0-9]+)/g;let m,n=0,bad=0;
+  while((m=re.exec(txt))){
+    const o=decode(m[1],m[2]);if(!o||!o.n){bad++;continue}
+    const k=normName(o.n),old=R[k];
+    if(!old||o.t>=old.t)R[k]=o;n++;
+  }
+  save();render();
+  $('msg').style.color=n?'var(--ok)':'var(--bad)';
+  $('msg').textContent=n?`✅ أُضيفت ${n} نتيجة`+(bad?` (وتعذّرت قراءة ${bad})`:''):'لم أجد نتائج في النص. تأكدي من نسخ الرسالة كاملة مع الرمز #QC';
+  if(n)$('paste').value='';
+}
+function merged(){
+  const M={};
+  const put=o=>{const k=normName(o.n);if(!M[k]||o.t>=M[k].t)M[k]=Object.assign({ok:true},o)};
+  Object.values(R).forEach(put);SRV.forEach(put);return Object.values(M);
+}
+function sorted(){return merged().sort((a,b)=>b.p-a.p||b.d-a.d||a.t-b.t)}
+function render(){
+  const L=sorted();
+  const avg=L.length?Math.round(L.reduce((s,o)=>s+o.p,0)/L.length):0;
+  $('stats').innerHTML=`<div class="stat"><b>${L.length}</b>طالبة أرسلت</div>
+    <div class="stat"><b>${L.filter(o=>o.d===4).length}</b>أنهت الرحلة</div>
+    <div class="stat"><b>${avg}</b>متوسط النقاط</div>
+    <div class="stat"><b>${L[0]?L[0].p:0}</b>أعلى نقاط</div>`;
+  if(!L.length){$('table').innerHTML='<div class="empty-state">📭 لا توجد نتائج بعد.<br>ستظهر الطالبات هنا تلقائيًا بمجرد أن يكتبن أسماءهن ويبدأن الرحلة.</div>';return}
+  const med=['🥇','🥈','🥉'];
+  $('table').innerHTML=`<table><tr><th>#</th><th>الاسم</th><th>النقاط</th><th>المحطات</th><th>💭 السؤال الإبداعي 1 (الخوارزمية)</th><th>💭 السؤال الإبداعي 2 (المخطط الانسيابي)</th></tr>
+   ${L.map((o,i)=>`<tr class="${i<3?'top'+(i+1):''}">
+     <td class="rank">${med[i]||i+1}</td>
+     <td class="name">${esc(o.n)}${o.ok?'':'<div class="warn">⚠️ الرمز معدّل</div>'}<div style="font-size:12px;color:var(--muted);font-weight:400">${new Date(o.t).toLocaleTimeString('ar-QA-u-nu-latn',{hour:'2-digit',minute:'2-digit'})}</div></td>
+     <td class="pts">${o.p}</td>
+     <td>${o.d}/4<div class="bar"><i style="width:${o.d*25}%"></i></div></td>
+     <td><div class="ans ${o.a1?'':'empty'}">${o.a1?esc(o.a1):'—'}</div></td>
+     <td><div class="ans ${o.a2?'':'empty'}">${o.a2?esc(o.a2):'—'}</div></td></tr>`).join('')}</table>`;
+}
+function copyTable(){
+  const L=sorted(),c=v=>String(v).replace(/[\t\n\r]+/g,' ');
+  const tsv=['الترتيب\tالاسم\tالنقاط\tالمحطات\tالسؤال الإبداعي 1\tالسؤال الإبداعي 2',...L.map((o,i)=>[i+1,c(o.n),o.p,o.d+'/4',c(o.a1),c(o.a2)].join('\t'))].join('\n');
+  const ok=()=>{$('msg').style.color='var(--ok)';$('msg').textContent='✅ نُسخ الجدول، الصقيه في Excel'};
+  try{navigator.clipboard.writeText(tsv).then(ok,()=>{$('msg').textContent='تعذّر النسخ'})}catch(e){}
+}
+function clearAll(btn){
+  if(!btn.dataset.sure){btn.dataset.sure=1;btn.textContent='⚠️ اضغطي مرة أخرى لمسح كل النتائج';setTimeout(()=>{delete btn.dataset.sure;btn.textContent='🗑️ مسح الكل'},4000);return}
+  R={};save();if(TK){fetchResults('DELETE').then(()=>{SRV=[];render()}).catch(()=>{})}SRV=[];render();delete btn.dataset.sure;btn.textContent='🗑️ مسح الكل';
+}
+function podium(){
+  const L=sorted().slice(0,3),med=['🥇','🥈','🥉'];
+  $('stage').innerHTML=L.length?L.map((o,i)=>`<div class="place g${i+1}"><div class="medal">${med[i]}</div><div class="who">${esc(o.n)}</div><div class="p">${o.p} نقطة</div><div class="block">${i+1}</div></div>`).join(''):'<p>لا توجد نتائج بعد</p>';
+  $('pod').classList.add('on');
+  const e=['🎉','⭐','✨','🎊','💛'];for(let i=0;i<60;i++){const d=document.createElement('div');d.className='confetti';d.textContent=e[i%5];d.style.left=Math.random()*100+'vw';d.style.animationDelay=Math.random()*1.5+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),4800)}
+}
+render();
+if(TK){$('tk').value='';login()}
+</script>
+</body>
+</html>

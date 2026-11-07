@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رحلة المبرمجة في قطر</title>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sea:#0e5f76; --sea2:#0a4557; --sand:#f6e7c8; --sand2:#ecd3a3; --coral:#ff6b4a; --sun:#ffc23d;
+  --leaf:#2f9e6e; --ink:#1d2b33; --muted:#5d6f78; --card:#fffaf0; --ok:#1f9d5c; --bad:#d6453a; --maroon:#8a1538;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Tajawal',sans-serif;color:var(--ink);
+  background:radial-gradient(circle at 20% 10%,#1b7f9a 0,transparent 45%),linear-gradient(180deg,var(--sea),var(--sea2));min-height:100vh}
+h1,h2,h3{font-family:'Lalezar',sans-serif;font-weight:400;margin:0}
+.wrap{max-width:580px;margin:0 auto;padding:16px 14px 40px}
+.top{display:flex;align-items:center;justify-content:space-between;color:#fff;gap:10px}
+.top h1{font-size:26px;line-height:1.2}
+.top small{display:block;opacity:.8;font-size:13px}
+.score{background:var(--sun);color:var(--ink);border-radius:16px;padding:6px 12px;text-align:center;font-weight:800;min-width:78px;box-shadow:0 4px 0 #c9921a}
+.score b{font-family:'Lalezar';font-size:24px;display:block;line-height:1}
+.progress{height:10px;background:rgba(255,255,255,.2);border-radius:99px;margin:12px 0 4px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sun),var(--coral));border-radius:99px;transition:width .6s}
+.map svg{width:100%;height:auto;display:block;margin-top:10px}
+.st{cursor:pointer}
+.st circle.halo{transform-origin:center;transform-box:fill-box;animation:pulse 1.6s infinite}
+@keyframes pulse{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.7)}}
+.hint-bar{background:rgba(255,255,255,.12);color:#fff;border-radius:14px;padding:10px 14px;font-size:15px;text-align:center;margin-top:6px}
+.screen{display:none}
+.screen.on{display:block;animation:up .35s ease}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border-radius:22px;padding:18px;margin-top:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.badge{display:inline-block;background:var(--coral);color:#fff;border-radius:99px;padding:3px 12px;font-weight:700;font-size:13px}
+.story{background:var(--sand);border-right:5px solid var(--sun);border-radius:14px;padding:12px 14px;margin:12px 0;line-height:1.9}
+.story:before{content:"📜 القصة";display:block;font-weight:800;color:#a3700c;font-size:13px}
+.learn{line-height:1.9;background:#fff;border-radius:18px;padding:12px 14px;margin-top:14px;border:2px solid #cfe8f1;animation:up .4s}
+.learn h3{color:var(--sea);font-size:20px;margin:2px 0 6px}
+.learn ul{padding-right:20px;margin:6px 0}
+.def{background:#e6f5f1;border-radius:14px;padding:12px;font-weight:700;border:2px dashed var(--leaf);margin:8px 0}
+.task{border:2px solid var(--sand2);border-radius:18px;padding:14px;margin-top:14px;background:#fff;animation:up .4s}
+.task h4{margin:0 0 8px;font-size:17px;line-height:1.7}
+.task .tag{display:inline-block;font-size:12px;font-weight:800;background:var(--coral);color:#fff;border-radius:99px;padding:2px 10px;margin-bottom:6px}
+.task .tag.think{background:#7b5cd6}
+.task .tag.book{background:var(--maroon)}
+.opt{display:flex;align-items:center;gap:8px;width:100%;text-align:right;font:inherit;font-size:16px;background:#f7f3ea;border:2px solid transparent;border-radius:12px;padding:10px 12px;margin:7px 0;cursor:pointer;color:var(--ink)}
+.opt:hover{border-color:var(--sand2)}
+.opt.right{background:#dcf5e7;border-color:var(--ok)}
+.opt.wrong{background:#fde3e0;border-color:var(--bad);animation:shake .3s}
+.opt svg{width:60px;height:34px;flex:none}
+@keyframes shake{25%{transform:translateX(5px)}75%{transform:translateX(-5px)}}
+.pool,.seq{display:flex;flex-direction:column;gap:7px}
+.chip{font:inherit;font-size:15px;text-align:right;background:#f7f3ea;border:2px solid var(--sand2);border-radius:12px;padding:9px 12px;cursor:pointer;color:var(--ink)}
+.seq .chip{background:#e9f4f8;border-color:#9cc9d8}
+.seq .chip:before{content:attr(data-n);display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--sea);color:#fff;font-weight:800;margin-left:8px;font-size:13px}
+.seqbox{border:2px dashed #9cc9d8;border-radius:14px;padding:8px;margin:8px 0}
+.seqbox .empty{color:var(--muted);font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.btn{font:inherit;font-weight:800;font-size:16px;border:0;border-radius:14px;padding:11px 18px;cursor:pointer;background:var(--sea);color:#fff;box-shadow:0 4px 0 var(--sea2)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--sea2)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.alt{background:#e8e2d4;color:var(--ink);box-shadow:0 4px 0 #c8bfa9}
+.btn.sun{background:var(--sun);color:var(--ink);box-shadow:0 4px 0 #c9921a}
+.btn.wide{width:100%}
+.fb{margin-top:8px;font-weight:700;min-height:22px;line-height:1.7}
+.fb.ok{color:var(--ok)} .fb.no{color:var(--bad)}
+.done-note{color:var(--ok);font-weight:800;margin-top:6px}
+.match{display:grid;grid-template-columns:90px 1fr;gap:10px;align-items:center;margin:8px 0}
+.match svg{width:90px;height:52px}
+.match select{font:inherit;font-size:15px;padding:9px;border-radius:12px;border:2px solid var(--sand2);background:#fff;width:100%}
+.match select.right{border-color:var(--ok);background:#dcf5e7}
+.match select.wrong{border-color:var(--bad);background:#fde3e0}
+textarea{font:inherit;font-size:16px;width:100%;min-height:96px;padding:10px;border-radius:14px;border:2px solid #cbbcf0;resize:vertical}
+.myans{background:#f1ecff;border-radius:12px;padding:10px;line-height:1.8;white-space:pre-wrap}
+.check{display:flex;gap:10px;align-items:center;background:#f7f3ea;border-radius:12px;padding:10px;margin-top:8px;cursor:pointer;font-weight:700}
+.check input{width:22px;height:22px}
+.bookbox{display:flex;gap:12px;align-items:center;background:#fbeef2;border-radius:14px;padding:12px;margin:6px 0}
+.bookbox .pg{font-family:'Lalezar';font-size:34px;color:var(--maroon);background:#fff;border-radius:12px;padding:2px 14px;border:3px solid var(--maroon)}
+.endbox{margin-top:16px;background:linear-gradient(135deg,var(--sun),#ffdf86);border-radius:20px;padding:16px;text-align:center;animation:up .4s;line-height:1.8}
+input.txt{font:inherit;font-size:20px;width:100%;padding:12px;border-radius:14px;border:2px solid var(--sand2);text-align:center;margin:10px 0;letter-spacing:4px}
+.modal{position:fixed;inset:0;background:rgba(5,30,40,.6);display:none;align-items:center;justify-content:center;padding:16px;z-index:9}
+.modal.on{display:flex}
+.modal .card{max-width:420px;width:100%;text-align:center}
+.cert{text-align:center;border:6px double var(--sun);background:#fffdf6}
+.cert .big{font-family:'Lalezar';font-size:56px;color:var(--coral);line-height:1}
+.cert .name{font-family:'Lalezar';font-size:32px;color:var(--sea)}
+.stars{font-size:30px;letter-spacing:4px}
+.welcome{text-align:center}
+.goals{text-align:right;background:#eef7f9;border-radius:14px;padding:10px 14px;font-size:14px;line-height:1.8;margin-top:10px}
+.foot{color:rgba(255,255,255,.6);font-size:12px;text-align:center;margin-top:16px}
+.confetti{position:fixed;top:-10px;font-size:22px;animation:fall 2.6s linear forwards;z-index:20;pointer-events:none}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+/* river puzzle */
+.river{display:grid;grid-template-columns:1fr 1.1fr 1fr;border-radius:16px;overflow:hidden;margin:10px 0;min-height:170px}
+.bank{background:linear-gradient(180deg,#9bd27a,#6fb35a);padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bank .lbl{font-size:12px;font-weight:800;background:rgba(255,255,255,.75);border-radius:99px;padding:1px 8px}
+.water{background:repeating-linear-gradient(170deg,#3aa6c4 0 12px,#48b3cf 12px 24px);background-size:100% 200%;animation:flowW 6s linear infinite;position:relative;min-height:170px}
+@keyframes flowW{to{background-position:0 100%}}
+.boat{position:absolute;top:50%;transform:translateY(-50%);width:72%;background:#8b5a2b;border-radius:6px 6px 26px 26px;min-height:58px;display:flex;align-items:center;justify-content:center;gap:2px;padding:2px;border-top:4px solid #a8743e;box-shadow:0 6px 0 rgba(0,0,0,.12)}
+.boat.p0{right:3%} .boat.p1{right:25%}
+.boat.m0{animation:m0 .8s ease} .boat.m1{animation:m1 .8s ease}
+@keyframes m1{from{right:3%}to{right:25%}} @keyframes m0{from{right:25%}to{right:3%}}
+.boat .farmer{font-size:30px}
+.item{font-size:34px;background:rgba(255,255,255,.6);border:2px solid transparent;border-radius:14px;width:58px;height:52px;cursor:pointer;line-height:1;display:grid;place-items:center;transition:transform .15s}
+.item:hover:not([disabled]){transform:scale(1.08);border-color:#fff}
+.item[disabled]{cursor:default;opacity:.7;background:rgba(255,255,255,.3)}
+.boat .item{width:46px;height:44px;font-size:28px;background:rgba(255,255,255,.3);border-color:var(--sun)}
+.tapme{font-size:11px;font-weight:800;color:#1d5a1d}
+.warn{background:#fff4d6;color:#8a5a00;border-radius:12px;padding:8px 10px;font-weight:700;font-size:14px;margin-top:8px}
+.hintbox{background:#f1ecff;color:#5b3fb8;border-radius:12px;padding:8px 10px;font-weight:700;font-size:14px;margin-top:8px}
+.log{background:#f4f8f9;border-radius:12px;padding:8px 12px;font-size:14px;line-height:1.8;margin-top:6px}
+.log ol{margin:0;padding-right:20px}
+.lost{background:#fde3e0;color:var(--bad);border-radius:12px;padding:10px;font-weight:800;text-align:center;margin-top:8px}
+.flow{display:block;margin:8px auto;max-width:300px;width:100%}
+/* animated background */
+.bg{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+.bg span{position:absolute;bottom:-60px;color:#bfe6ef;opacity:0;font-family:monospace;font-weight:700;animation:floatUp linear infinite;white-space:nowrap}
+.bg span.e{filter:saturate(.45)}
+@keyframes floatUp{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:var(--o)}90%{opacity:var(--o)}100%{transform:translateY(-115vh) rotate(var(--r));opacity:0}}
+.wrap{position:relative;z-index:1}
+@media (prefers-reduced-motion:reduce){.bg span{animation:none;opacity:var(--o);bottom:auto;top:var(--y)}}
+</style>
+</head>
+<body>
+<div class="bg" id="bg"></div>
+<button id="mute" onclick="toggleMute()" title="الصوت" style="position:fixed;bottom:14px;left:14px;z-index:8;width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font-size:22px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25)">🔊</button>
+<div class="wrap">
+
+  <section id="s-welcome" class="screen on">
+    <div class="card welcome">
+      <div style="font-size:54px">🧭🇶🇦</div>
+      <h1 style="font-size:32px;color:var(--sea)">رحلة المبرمجة في قطر</h1>
+      <p style="line-height:1.8;margin:8px 0">استعدّي لرحلة عبر <b>4 محطات</b> في قطر! في كل محطة قصة ولغز ومهمة، وعند إنهائها تحصلين على <b>رقم السر من معلمتك</b> لتنتقلي إلى المحطة التالية وتجمعي النقاط.</p>
+      <div class="goals">
+        🎯 <b>في نهاية الرحلة ستتمكنين من:</b><br>
+        1. توضيح مفهوم الخوارزمية<br>
+        2. توضيح مفهوم المخطط الانسيابي ورموزه<br>
+        3. ذكر مراحل إنشاء برنامج لحل مشكلة محددة<br>
+        4. حل المشكلات باستخدام الخوارزمية والمخطط الانسيابي
+      </div>
+      <input id="nm" class="txt" style="letter-spacing:0" placeholder="اكتبي اسمك هنا ✍️" maxlength="30">
+      <button class="btn sun wide" onclick="start()">🚀 ابدئي الرحلة</button>
+      <div class="fb no" id="nmfb"></div>
+    </div>
+  </section>
+
+  <section id="s-map" class="screen">
+    <div class="top">
+      <div><h1>خريطة الرحلة</h1><small id="hello"></small><small id="live" style="display:none;background:rgba(255,255,255,.15);border-radius:99px;padding:1px 8px;margin-top:3px">🟢 نتيجتك تصل لمعلمتك تلقائيًا</small></div>
+      <div class="score"><b id="pts">0</b>نقطة</div>
+    </div>
+    <div class="progress"><i id="bar"></i></div>
+    <div class="map" id="map"></div>
+    <div class="hint-bar" id="maphint"></div>
+    <div style="text-align:center;margin-top:12px"><button class="btn sun" style="margin-bottom:10px" onclick="openSend()">📤 أرسلي نتيجتي لمعلمتي</button><br><button class="btn alt reset" style="font-size:14px;padding:8px 16px" onclick="resetAll(this)">🔄 ابدئي الرحلة من جديد</button></div>
+  </section>
+
+  <section id="s-station" class="screen">
+    <div class="top">
+      <button class="btn alt" onclick="goMap()">🗺️ الخريطة</button>
+      <div class="score"><b id="pts2">0</b>نقطة</div>
+    </div>
+    <div class="card" id="stcard"></div>
+  </section>
+
+  <section id="s-end" class="screen">
+    <div class="card cert">
+      <div style="font-size:50px">🏆</div>
+      <h2 style="color:var(--sea);font-size:26px">شهادة بطلة حل المشكلات</h2>
+      <p>تشهد رحلة المبرمجة في قطر أن الطالبة</p>
+      <div class="name" id="cname"></div>
+      <p>أتمّت المحطات الأربع: فويرط • القرم • واحة العلوم • مزرعة الشمال</p>
+      <div class="big" id="cpts"></div>
+      <div>من 100 نقطة</div>
+      <div class="stars" id="cstars"></div>
+      <p style="font-size:13px;color:var(--muted)" id="cdate"></p>
+      <button class="btn sun wide" style="margin:8px 0" onclick="openSend()">📤 أرسلي نتيجتي لمعلمتي</button>
+      <div class="row" style="justify-content:center"><button class="btn alt" onclick="goMap()">العودة للخريطة</button><button class="btn alt reset" onclick="resetAll(this)">🔄 ابدئي من جديد</button></div>
+    </div>
+  </section>
+
+  <div class="foot">الحوسبة وتكنولوجيا المعلومات • الصف التاسع • خطوات حل المشكلات</div>
+</div>
+
+<div class="modal" id="send">
+  <div class="card">
+    <div style="font-size:42px">📤</div>
+    <h2 style="color:var(--sea);font-size:24px">أرسلي نتيجتك لمعلمتك</h2>
+    <p style="line-height:1.8">1. اضغطي <b>نسخ</b><br>2. الصقيها في <b>محادثة الحصة</b> وأرسليها</p>
+    <textarea id="sendtxt" readonly style="min-height:90px;font-size:12px;direction:ltr;text-align:left" onclick="this.select()"></textarea>
+    <div class="fb" id="sendfb"></div>
+    <div class="row" style="justify-content:center">
+      <button class="btn" onclick="copySend()">📋 نسخ</button>
+      <button class="btn alt" onclick="$('send').classList.remove('on')">إغلاق</button>
+    </div>
+  </div>
+</div>
+<div class="modal" id="lock">
+  <div class="card">
+    <div style="font-size:46px">🔒</div>
+    <h2 style="color:var(--sea);font-size:24px" id="locktitle"></h2>
+    <p id="locktext"></p>
+    <input id="pw" class="txt" inputmode="numeric" placeholder="----" autocomplete="off">
+    <div class="fb no" id="pwfb"></div>
+    <div class="row" style="justify-content:center">
+      <button class="btn" onclick="tryPass()">🔓 افتحي</button>
+      <button class="btn alt" onclick="closeLock()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== flowchart symbols ===== */
+const SYM={
+  oval:'<svg viewBox="0 0 90 52"><rect x="5" y="8" width="80" height="36" rx="18" fill="#ffe3a3" stroke="#1d2b33" stroke-width="2.5"/></svg>',
+  rect:'<svg viewBox="0 0 90 52"><rect x="8" y="8" width="74" height="36" fill="#cfe8f1" stroke="#1d2b33" stroke-width="2.5"/></svg>',
+  para:'<svg viewBox="0 0 90 52"><polygon points="20,8 85,8 70,44 5,44" fill="#d9f2e4" stroke="#1d2b33" stroke-width="2.5"/></svg>',
+  diam:'<svg viewBox="0 0 90 52"><polygon points="45,3 85,26 45,49 5,26" fill="#ffd6cc" stroke="#1d2b33" stroke-width="2.5"/></svg>'
+};
+function flowSVG(nodes){
+  const W=280,H=44,G=26,cx=W/2,w=210;let y=6,out='';
+  const fill={oval:'#ffe3a3',rect:'#cfe8f1',para:'#d9f2e4'};
+  nodes.forEach((n,i)=>{
+    const x=cx-w/2;
+    if(n[0]==='oval')out+=`<rect x="${x+25}" y="${y}" width="${w-50}" height="${H}" rx="22" fill="${fill.oval}" stroke="#1d2b33" stroke-width="2"/>`;
+    if(n[0]==='rect')out+=`<rect x="${x}" y="${y}" width="${w}" height="${H}" fill="${fill.rect}" stroke="#1d2b33" stroke-width="2"/>`;
+    if(n[0]==='para')out+=`<polygon points="${x+16},${y} ${x+w},${y} ${x+w-16},${y+H} ${x},${y+H}" fill="${fill.para}" stroke="#1d2b33" stroke-width="2"/>`;
+    out+=`<text x="${cx}" y="${y+H/2+5}" text-anchor="middle" font-family="Tajawal" font-weight="700" font-size="14" fill="#1d2b33">${n[1]}</text>`;
+    if(i<nodes.length-1)out+=`<line x1="${cx}" y1="${y+H}" x2="${cx}" y2="${y+H+G-4}" stroke="#1d2b33" stroke-width="2" marker-end="url(#ar)"/>`;
+    y+=H+G;
+  });
+  return `<svg class="flow" viewBox="0 0 ${W} ${y-G+10}"><defs><marker id="ar" markerWidth="8" markerHeight="8" refX="4" refY="7" orient="auto"><path d="M0,0 L8,0 L4,8z" fill="#1d2b33"/></marker></defs>${out}</svg>`;
+}
+const FLOW_AVG=flowSVG([['oval','البداية'],['para','أدخل العدد الأول والعدد الثاني'],['rect','المجموع = العدد الأول + العدد الثاني'],['rect','المتوسط = المجموع ÷ 2'],['para','اطبع المتوسط'],['oval','النهاية']]);
+const FLOW_AREA=flowSVG([['oval','البداية'],['para','أدخل الطول والعرض'],['rect','المساحة = الطول × العرض'],['para','اطبع المساحة'],['oval','النهاية']]);
+
+/* ===== رموز السر (مع المعلمة) — code[i] يفتح المحطة i ===== */
+const CODES=['1590','2468','1357','9024'];
+
+/* ===== content ===== */
+const STATIONS=[
+{
+  title:'شاطئ فويرط', icon:'🏖️',
+  story:`على ضفة النهر قرب <b>شاطئ فويرط</b> يقف مزارع ومعه <b>ثعلب 🦊</b> و<b>دجاجة 🐔</b> و<b>كيس حبوب 🌾</b>. يريد عبور النهر بقارب صغير <b>لا يتّسع إلا له ولشيء واحد معه</b>.<br>
+  ⚠️ إذا تُرك الثعلب مع الدجاجة وحدهما <b>سيأكل الثعلب الدجاجة</b>.<br>
+  ⚠️ وإذا تُركت الدجاجة مع الحبوب وحدهما <b>ستأكل الدجاجة الحبوب</b>.<br>
+  🤔 كيف يمكنه نقل الجميع إلى الضفة الثانية بأمان؟`,
+  flow:[
+    {type:'puzzle',q:'ساعدي المزارع! اضغطي على ما تريدين وضعه في القارب، ثم اضغطي "اعبري النهر".'},
+    {type:'open',q:'لو طلب منكِ المزارع أن تكتبي له طريقة الحل في رسالة ليتّبعها غدًا وحده دون أن يخطئ، <b>ما الصفات التي يجب أن تتوفر في هذه الخطوات؟</b> وما الاسم الذي تقترحينه لها؟',ph:'اكتبي أفكارك هنا… (مثلًا: يجب أن تكون الخطوات…)'},
+    {type:'learn',html:`<h3>💡 ما وصفتِه هو الخوارزمية!</h3>
+      <div class="def">الخوارزمية: مجموعة من الخطوات المنطقية المتسلسلة والمحددة التي نتبعها لحل مشكلة ما والوصول إلى النتيجة.</div>
+      <ul><li><b>متسلسلة:</b> كل خطوة في مكانها الصحيح (لو بدأ المزارع بالثعلب لأكلت الدجاجة الحبوب!).</li>
+      <li><b>واضحة ومحددة:</b> لا تحتمل أكثر من معنى.</li>
+      <li><b>منتهية:</b> لها بداية ونهاية وتوصل للحل.</li></ul>
+      قارني تعريفك بهذا التعريف: ما الكلمات المشتركة بينهما؟ 🔍`},
+    {type:'order',q:'المزارع يريد حساب <b>متوسط عددين</b> (متوسط إنتاج مزرعته في يومين). رتّبي خطوات الخوارزمية بالضغط عليها بالترتيب الصحيح:',
+     items:['البداية','أدخل العدد الأول والعدد الثاني','احسب المجموع = العدد الأول + العدد الثاني','احسب المتوسط = المجموع ÷ 2','اطبع المتوسط','النهاية']},
+    {type:'mcq',q:'🧪 نفّذي الخوارزمية: إذا كان العدد الأول = <b>6</b> والعدد الثاني = <b>10</b>، فما المتوسط الذي سيُطبع؟',
+     opts:['16','8','4','60'],a:1}
+  ]
+},
+{
+  title:'غابة القرم', icon:'🌿',
+  story:`في <b>محمية أشجار القرم</b> بالذخيرة، يأخذ المرشد مجموعة من الزوار في جولة بالقارب بين الأشجار. الزوار من دول مختلفة ولا يفهمون لغة واحدة… فأعطاهم المرشد <b>لوحة عليها أشكال وأسهم فقط</b>، ففهم الجميع المسار وخطوات الجولة دون كلمة واحدة! 🛶`,
+  flow:[
+    {type:'open',q:'لماذا فهم الزوار الخطوات من الأشكال والأسهم أسرع من الكلام المكتوب؟ ولو أردتِ تحويل <b>خوارزمية حساب المتوسط</b> إلى رسم، <b>ماذا ستستخدمين؟</b> وكيف ستميّزين البداية والإدخال والحساب؟',ph:'اكتبي أفكارك هنا…'},
+    {type:'learn',html:`<h3>💡 هذه الفكرة اسمها المخطط الانسيابي!</h3>
+      <div class="def">المخطط الانسيابي: تمثيل بياني (رسم) لخطوات الخوارزمية باستخدام أشكال ورموز متفق عليها، تربط بينها أسهم توضّح اتجاه سير الحل.</div>
+      <div class="match">${SYM.oval}<div><b>شكل بيضاوي:</b> البداية / النهاية</div></div>
+      <div class="match">${SYM.para}<div><b>متوازي أضلاع:</b> إدخال / إخراج</div></div>
+      <div class="match">${SYM.rect}<div><b>مستطيل:</b> عملية (معالجة / حساب)</div></div>
+      <div class="match">${SYM.diam}<div><b>معيّن:</b> قرار (سؤال إجابته نعم / لا)</div></div>
+      <div><b>➡️ الأسهم:</b> تبيّن اتجاه انتقال الخطوات.</div>`},
+    {type:'match',q:'اختاري معنى كل رمز من لوحة المرشد:',
+     pairs:[['diam','قرار'],['oval','بداية / نهاية'],['rect','عملية'],['para','إدخال / إخراج']]},
+    {type:'mcq',q:'ما فائدة المخطط الانسيابي؟',
+     opts:['يجعل الحاسوب أسرع','يوضح خطوات الحل بالرسم فيسهل فهمها واكتشاف أخطائها','يُغني عن التفكير في الحل','يُستخدم لتلوين البرامج'],a:1},
+    {type:'work',tag:'📝 ورقة العمل',
+     q:'في ورقة العمل، <b>ارسمي المخطط الانسيابي لخوارزمية حساب متوسط عددين</b> (من محطة شاطئ فويرط) مستخدمةً الرموز الصحيحة والأسهم.',
+     confirm:'أنهيتُ رسم المخطط في ورقة العمل',code:'1122',
+     after:`<b>✅ التغذية الراجعة: قارني رسمك بهذا المخطط</b>${FLOW_AVG}`}
+  ]
+},
+{
+  title:'واحة قطر للعلوم', icon:'⚙️',
+  story:`في <b>واحة قطر للعلوم والتكنولوجيا</b> يعمل فريق من المبرمجين الشباب على تطوير تطبيقات جديدة. لكن بعض البرامج <b>تخرج وفيها أخطاء ولا تعمل كما هو مطلوب</b>! 😟 اكتشف قائد الفريق أن السبب هو تخطّي بعض المراحل أو تنفيذها بترتيب خاطئ… ساعدي الفريق في معرفة مراحل إنشاء البرنامج الصحيحة.`,
+  flow:[
+    {type:'work',tag:'📖 الكتاب',
+     q:`<div class="bookbox"><div class="pg">102</div><div>افتحي <b>كتاب الطالبة صفحة 102</b>، واقرئي مراحل إنشاء برنامج لحل مشكلة، ثم <b>حلّي ورقة العمل</b>.</div></div>`,
+     confirm:'قرأتُ الصفحة وحللتُ ورقة العمل',code:'3344',after:''},
+    {type:'learn',html:`<h3>✅ التغذية الراجعة: مراحل إنشاء برنامج لحل مشكلة</h3>
+      قارني إجاباتك في ورقة العمل بالمراحل التالية:
+      <ul>
+       <li><b>1. اكتشف المشكلة:</b> نحدد المشكلة الموجودة أمامنا ونكتب الخطوات اللازمة لحلها.</li>
+       <li><b>2. فكّر في الحل كخوارزمية:</b> نرتّب خطوات الحل ترتيبًا منطقيًا تسلسليًا، وهذه الخطوات تُسمّى خوارزمية.</li>
+       <li><b>3. ارسم المخطط الانسيابي:</b> يُظهر التسلسل المنطقي للخوارزمية مع الخطوات والارتباطات بينها.</li>
+       <li><b>4. اكتب المقطع البرمجي:</b> نكتب المقطع البرمجي (Code) بلغة البايثون (Python).</li>
+      </ul>`},
+    {type:'order',q:'رتّبي مراحل العمل لفريق البرمجة:',
+     items:['اكتشف المشكلة','فكّر في الحل كخوارزمية','ارسم المخطط الانسيابي','اكتب المقطع البرمجي']},
+    {type:'mcq',q:'في أي مرحلة نرتّب خطوات الحل ترتيبًا منطقيًا تسلسليًا؟',
+     opts:['اكتشف المشكلة','فكّر في الحل كخوارزمية','ارسم المخطط الانسيابي','اكتب المقطع البرمجي'],a:1},
+    {type:'mcq',q:'المرحلة الأخيرة هي كتابة المقطع البرمجي، بأي لغة نكتبه؟',
+     opts:['Scratch','HTML','Python','Excel'],a:2}
+  ]
+},
+{
+  title:'مزرعة الشمال', icon:'🌾',
+  story:`عاد المزارع من فويرط إلى <b>مزرعته في شمال قطر</b> 🚜. يريد أن يزرع الحبوب في <b>حقل مستطيل الشكل</b>، ويحتاج إلى معرفة <b>مساحة الحقل</b> ليعرف كمية البذور التي يشتريها. ساعديه بتصميم برنامج يحسب <b>مساحة المستطيل</b>!`,
+  flow:[
+    {type:'mcq',q:'🔍 أولًا: حلّلي المشكلة. ما <b>المدخلات</b> التي يحتاجها البرنامج؟',
+     opts:['المساحة فقط','الطول والعرض','كمية البذور','عدد المزارع'],a:1},
+    {type:'learn',html:`<h3>تحليل المشكلة</h3>
+      <ul><li><b>المدخلات:</b> الطول، العرض</li>
+      <li><b>المعالجة:</b> المساحة = الطول × العرض</li>
+      <li><b>المخرجات:</b> المساحة</li></ul>`},
+    {type:'order',q:'رتّبي خطوات خوارزمية حساب مساحة المستطيل:',
+     items:['البداية','أدخل الطول والعرض','احسب المساحة = الطول × العرض','اطبع المساحة','النهاية']},
+    {type:'mcq',q:'الخطوة "المساحة = الطول × العرض" نرسمها في المخطط الانسيابي بالرمز:',
+     opts:[SYM.para+' متوازي أضلاع',SYM.rect+' مستطيل',SYM.diam+' معيّن',SYM.oval+' بيضاوي'],a:1},
+    {type:'mcq',q:'🧪 اختبري البرنامج: إذا أدخل المزارع الطول = <b>8</b> والعرض = <b>5</b>، فماذا سيطبع البرنامج؟',
+     opts:['13','26','40','85'],a:2},
+    {type:'learn',html:`<h3>🌟 المخطط الانسيابي للحل</h3>${FLOW_AREA}`}
+  ]
+}];
+const PER=25;
+const scored=i=>STATIONS[i].flow.filter(b=>b.type!=='learn').length;
+
+/* ===== sounds (Web Audio, no files) ===== */
+let AC=null,MUTE=false;
+try{MUTE=localStorage.getItem('qc-mute')==='1'}catch(e){}
+function tone(f,d,type,vol,delay,f2){
+  if(MUTE)return;
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
+    const t=AC.currentTime+(delay||0),o=AC.createOscillator(),g=AC.createGain();
+    o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol||.15,t+.02);g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d+.05);}catch(e){}
+}
+const sfx={
+  tick:()=>tone(880,.06,'sine',.06),
+  nav:()=>{tone(520,.09,'sine',.09);tone(780,.12,'sine',.08,.07)},
+  ok:()=>{tone(660,.12,'triangle',.14);tone(990,.2,'triangle',.13,.1)},
+  bad:()=>{tone(220,.18,'sine',.12,0,170);tone(180,.22,'sine',.1,.12,140)},
+  boat:()=>{tone(300,.5,'sine',.06,0,420);tone(450,.4,'triangle',.04,.15,350)},
+  unlock:()=>{[523,659,784,1047].forEach((f,i)=>tone(f,.18,'triangle',.12,i*.07))},
+  win:()=>{[523,659,784,659,784,1047].forEach((f,i)=>tone(f,.22,'triangle',.13,i*.11))},
+  fanfare:()=>{[392,523,659,784,659,784,1047,1047].forEach((f,i)=>tone(f,i>5?.45:.2,'triangle',.14,i*.13));tone(262,1.1,'sine',.08,.5)}
+};
+function toggleMute(){MUTE=!MUTE;try{localStorage.setItem('qc-mute',MUTE?'1':'0')}catch(e){}$('mute').textContent=MUTE?'🔇':'🔊';if(!MUTE)sfx.tick()}
+
+/* ===== state ===== */
+const KEY='qatar-coder-v3';
+let S={name:'',unlocked:0,done:[],pts:0,ts:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.ts)S=s;}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}sync()}
+/* ===== live sync to teacher board (works when hosted on Vercel) ===== */
+let syncT=null;
+function sync(){
+  if(!S.name)return;
+  if(!S.sid){S.sid=Date.now().toString(36)+Math.random().toString(36).slice(2,10);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+  clearTimeout(syncT);
+  syncT=setTimeout(()=>{
+    try{fetch('/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sid:S.sid,n:S.name,p:S.pts,d:S.done.length,a1:(S.ts['0-1']||{}).ans||'',a2:(S.ts['1-0']||{}).ans||''})})
+      .then(r=>{const d=$('live');if(d)d.style.display=r.ok?'inline-block':'none'}).catch(()=>{})}catch(e){}
+  },600);
+}
+const $=id=>document.getElementById(id);
+function show(id){sfx.nav();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');window.scrollTo(0,0)}
+const digits=t=>t.replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/\s/g,'');
+const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function start(){
+  const n=$('nm').value.trim();
+  if(!n){$('nmfb').textContent='اكتبي اسمك أولًا 🙂';return}
+  S.name=n;save();goMap();
+}
+function goMap(){show('s-map');drawMap()}
+function updPts(){const p=Math.round(S.pts);$('pts').textContent=p;$('pts2').textContent=p;$('bar').style.width=(S.done.length*25)+'%'}
+
+/* ===== map ===== */
+const POS=[[95,450],[262,355],[100,240],[255,120]];
+function drawMap(){
+  updPts();
+  $('hello').textContent='المبرمجة: '+S.name;
+  const path='M60,500 C70,470 80,460 95,450 S230,400 262,355 S140,280 100,240 S200,160 255,120 S290,60 300,45';
+  let g='';
+  POS.forEach((p,i)=>{
+    const done=S.done.includes(i),open=i<S.unlocked,cur=open&&!done;
+    const fill=done?'#2f9e6e':open?'#ff6b4a':'#9aa7ad';
+    g+=`<g class="st" onclick="openStation(${i})">
+      ${cur?`<circle class="halo" cx="${p[0]}" cy="${p[1]}" r="30" fill="${fill}"/>`:''}
+      <circle cx="${p[0]}" cy="${p[1]}" r="30" fill="#fff" stroke="${fill}" stroke-width="6"/>
+      <text x="${p[0]}" y="${p[1]+9}" text-anchor="middle" font-size="26">${done?'✅':open?STATIONS[i].icon:'🔒'}</text>
+      <rect x="${p[0]-72}" y="${p[1]+36}" width="144" height="26" rx="13" fill="${fill}"/>
+      <text x="${p[0]}" y="${p[1]+54}" text-anchor="middle" fill="#fff" font-family="Tajawal" font-weight="800" font-size="14">${i+1}. ${STATIONS[i].title}</text>
+    </g>`;
+  });
+  const fin=S.done.length===4;
+  $('map').innerHTML=`<svg viewBox="0 0 360 540">
+   <defs><radialGradient id="isl" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#f9edd2"/><stop offset=".85" stop-color="#ecd3a3"/><stop offset="1" stop-color="#d9b97c"/></radialGradient></defs>
+   <path d="M40,90 C20,200 10,330 30,440 C45,520 150,535 230,520 C330,505 350,420 345,300 C340,180 350,70 270,30 C180,-5 60,10 40,90Z" fill="#7cc6d6" opacity=".35" transform="translate(0,4)"/>
+   <path d="M50,95 C30,200 25,330 42,430 C55,505 150,518 228,505 C320,490 335,410 330,300 C325,185 335,85 265,45 C185,10 70,25 50,95Z" fill="url(#isl)"/>
+   <text x="300" y="250" font-size="34">🌴</text><text x="40" y="350" font-size="30">🌴</text><text x="180" y="300" font-size="22">🐪</text>
+   <text x="160" y="90" font-size="24">🏜️</text><text x="210" y="470" font-size="22">🐚</text>
+   <text x="15" y="60" font-size="24">🐟</text><text x="320" y="520" font-size="24">⛵</text>
+   <path d="${path}" fill="none" stroke="#a5743a" stroke-width="5" stroke-dasharray="2 12" stroke-linecap="round"/>
+   <text x="44" y="520" font-size="26">🛶</text>
+   <text x="288" y="50" font-size="30" class="st" onclick="${fin?"show('s-end');fillCert()":''}">${fin?'🏆':'🏁'}</text>
+   ${g}</svg>`;
+  const n=S.done.length+1;
+  $('maphint').innerHTML=fin?'🎉 أنهيتِ الرحلة! اضغطي على الكأس 🏆 لرؤية شهادتك':
+    S.unlocked>S.done.length?`👆 اضغطي على المحطة <b>${n}</b>`:
+    `🙋‍♀️ اطلبي <b>رقم السر</b> من معلمتك، ثم اضغطي على المحطة <b>${n}</b> لفتحها`;
+}
+
+/* ===== lock ===== */
+let lockIdx=null;
+function openStation(i){
+  if(i<S.unlocked){renderStation(i);return}
+  if(i>S.done.length){$('maphint').textContent='أكملي المحطات السابقة أولًا 🚶‍♀️';return}
+  lockIdx=i;$('locktitle').textContent='المحطة '+(i+1)+': '+STATIONS[i].title;
+  $('locktext').textContent=i===0?'اطلبي من معلمتك رقم السر لبدء الرحلة وفتح المحطة الأولى.':'أدخلي رقم السر الذي تعطيكِ إياه معلمتك لفتح هذه المحطة.';
+  $('pw').value='';$('pwfb').textContent='';$('lock').classList.add('on');setTimeout(()=>$('pw').focus(),50);
+}
+function closeLock(){$('lock').classList.remove('on')}
+function tryPass(){
+  if(digits($('pw').value)===CODES[lockIdx]){
+    S.unlocked=lockIdx+1;save();closeLock();sfx.unlock();confetti(12);renderStation(lockIdx);
+  }else{sfx.bad(); $('pwfb').textContent='رقم السر غير صحيح ❌ تأكدي منه مع معلمتك';}
+}
+$('pw').addEventListener('keydown',e=>{if(e.key==='Enter')tryPass()});
+
+/* ===== station ===== */
+let cur=null;
+function ts(k){const id=cur+'-'+k;if(!S.ts[id])S.ts[id]={ok:false,tries:0};return S.ts[id]}
+function renderStation(i,focusK){
+  cur=i;const st=STATIONS[i];
+  let h=`<span class="badge">المحطة ${i+1} من 4</span>
+   <h2 style="font-size:28px;color:var(--sea);margin-top:6px">${st.icon} ${st.title}</h2>
+   <div class="story">${st.story}</div>`;
+  const shown=[];
+  for(let k=0;k<st.flow.length;k++){
+    const b=st.flow[k];
+    if(b.type==='learn'){h+=`<div class="learn" id="t${k}">${b.html}</div>`;continue}
+    h+=`<div class="task" id="t${k}"></div>`;shown.push(k);
+    if(!ts(k).ok)break;
+  }
+  h+=`<div id="endbox"></div>`;
+  $('stcard').innerHTML=h;
+  shown.forEach(renderTask);
+  updPts();checkDone(false);
+  if(!$('s-station').classList.contains('on'))show('s-station');
+  if(focusK!=null){const nx=$('t'+(focusK+1));if(nx)setTimeout(()=>nx.scrollIntoView({behavior:'smooth',block:'start'}),120)}
+}
+function award(k){
+  const s=ts(k);if(s.ok)return;s.ok=true;
+  const full=PER/scored(cur),got=Math.max(full*0.4,full-s.tries*full/4);
+  s.got=got;S.pts+=got;save();
+  setTimeout(()=>renderStation(cur,k),650);
+}
+function miss(k){ts(k).tries++;save()}
+const TAGS={mcq:'🎯 مهمة',order:'🎯 مهمة',match:'🎯 مهمة',open:'💭 سؤال تفكير إبداعي',puzzle:'🧩 لغز',work:'📝 ورقة العمل'};
+function head(k,b){
+  const cls=b.type==='open'?'think':b.type==='work'?'book':'';
+  return `<span class="tag ${cls}">${b.tag||TAGS[b.type]}</span><h4>${b.q}</h4>`;
+}
+function renderTask(k){
+  const b=STATIONS[cur].flow[k],el=$('t'+k),s=ts(k);
+  if(s.ok){
+    let extra='';
+    if(b.type==='open')extra=`<div class="myans">${esc(s.ans||'')}</div>`;
+    if(b.type==='puzzle')extra=`<div class="log"><b>خطواتك للحل:</b><ol>${(s.steps||[]).map(x=>`<li>${x}</li>`).join('')}</ol></div>`;
+    if(b.type==='order')extra=`<div class="log"><ol>${b.items.map(x=>`<li>${x}</li>`).join('')}</ol></div>`;
+    if(b.type==='work')extra=b.after?`<div style="margin-top:8px">${b.after}</div>`:'';
+    el.innerHTML=head(k,b)+extra+`<div class="done-note">✅ أُنجزت (+${Math.round(s.got*10)/10} نقطة)</div>`;
+    return;
+  }
+  if(b.type==='mcq'){
+    el.innerHTML=head(k,b)+b.opts.map((o,j)=>`<button class="opt" onclick="ansMcq(${k},${j},this)">${o}</button>`).join('')+`<div class="fb" id="fb${k}"></div>`;
+  }else if(b.type==='order'){
+    el.dataset.seq='[]';el.dataset.sh=JSON.stringify(b.items.map((x,j)=>j).sort(()=>Math.random()-.5));
+    drawOrder(k);
+  }else if(b.type==='match'){
+    const opts=[...new Set(b.pairs.map(p=>p[1]))];
+    el.innerHTML=head(k,b)+b.pairs.map((p,j)=>`<div class="match">${SYM[p[0]]}<select id="m${k}-${j}"><option value="">— اختاري —</option>${opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`).join('')+
+      `<button class="btn" onclick="chkMatch(${k})">تحقّقي ✔</button><div class="fb" id="fb${k}"></div>`;
+  }else if(b.type==='open'){
+    el.innerHTML=head(k,b)+`<textarea id="oa${k}" placeholder="${b.ph||''}"></textarea>
+     <button class="btn" onclick="sendOpen(${k})">أرسلي إجابتي ✨</button><div class="fb" id="fb${k}"></div>`;
+  }else if(b.type==='work'){
+    el.innerHTML=head(k,b)+`<label class="check"><input type="checkbox" id="wc${k}" onchange="sfx.tick();$('wcode${k}').style.display=this.checked?'block':'none'"> ${b.confirm}</label>
+     <div id="wcode${k}" style="display:none;margin-top:8px">
+       <div class="warn" style="background:#fbeef2;color:var(--maroon)">🙋‍♀️ أخبري معلمتك أنكِ أنهيتِ ورقة العمل لتعطيكِ <b>رمز التغذية الراجعة</b>.</div>
+       <input id="wi${k}" class="txt" inputmode="numeric" placeholder="----" autocomplete="off" onkeydown="if(event.key==='Enter')chkWork(${k})">
+       <button class="btn wide" onclick="chkWork(${k})">🔓 اعرضي التغذية الراجعة</button>
+       <div class="fb" id="fb${k}"></div></div>`;
+  }else if(b.type==='puzzle'){
+    P=newP();drawPuzzle(k);
+  }
+}
+function ansMcq(k,j,btn){
+  const b=STATIONS[cur].flow[k];
+  if(j===b.a){sfx.ok();btn.classList.add('right');$('fb'+k).className='fb ok';$('fb'+k).textContent='إجابة صحيحة! 🌟';award(k)}
+  else{sfx.bad();btn.classList.add('wrong');miss(k);$('fb'+k).className='fb no';$('fb'+k).textContent='ليست الإجابة الصحيحة، فكّري مرة أخرى 🤔';}
+}
+function drawOrder(k){
+  const b=STATIONS[cur].flow[k],el=$('t'+k);
+  const seq=JSON.parse(el.dataset.seq),sh=JSON.parse(el.dataset.sh),pool=sh.filter(j=>!seq.includes(j));
+  el.innerHTML=head(k,b)+`
+   <div class="pool">${pool.map(j=>`<button class="chip" onclick="pick(${k},${j})">${b.items[j]}</button>`).join('')}</div>
+   <div class="seqbox"><div class="seq">${seq.length?seq.map((j,n)=>`<button class="chip" data-n="${n+1}" onclick="unpick(${k},${j})">${b.items[j]}</button>`).join(''):'<span class="empty">⬇️ ستظهر الخطوات هنا بالترتيب الذي تختارينه (اضغطي على خطوة لإزالتها)</span>'}</div></div>
+   <div class="row"><button class="btn" onclick="chkOrder(${k})" ${pool.length?'disabled':''}>تحقّقي ✔</button><button class="btn alt" onclick="resetOrder(${k})">↺ من جديد</button></div>
+   <div class="fb" id="fb${k}"></div>`;
+}
+function pick(k,j){sfx.tick();const el=$('t'+k),s=JSON.parse(el.dataset.seq);s.push(j);el.dataset.seq=JSON.stringify(s);drawOrder(k)}
+function unpick(k,j){const el=$('t'+k);el.dataset.seq=JSON.stringify(JSON.parse(el.dataset.seq).filter(x=>x!==j));drawOrder(k)}
+function resetOrder(k){$('t'+k).dataset.seq='[]';drawOrder(k)}
+function chkOrder(k){
+  const s=JSON.parse($('t'+k).dataset.seq),right=s.filter((j,n)=>j===n).length;
+  if(right===s.length){sfx.ok();$('fb'+k).className='fb ok';$('fb'+k).textContent='ترتيب ممتاز! 🌟';award(k)}
+  else{sfx.bad();miss(k);$('fb'+k).className='fb no';$('fb'+k).textContent=`${right} من ${s.length} في مكانها الصحيح. أعيدي المحاولة 💪`;}
+}
+function chkMatch(k){
+  const b=STATIONS[cur].flow[k];let all=true;
+  b.pairs.forEach((p,j)=>{const sel=$('m'+k+'-'+j),ok=sel.value===p[1];sel.className=ok?'right':'wrong';if(!ok)all=false});
+  if(all){sfx.ok();$('fb'+k).className='fb ok';$('fb'+k).textContent='رائع! كل الرموز صحيحة 🌟';award(k)}
+  else{sfx.bad();miss(k);$('fb'+k).className='fb no';$('fb'+k).textContent='بعض الإجابات تحتاج تصحيحًا (الحمراء) ✏️';}
+}
+function chkWork(k){
+  const b=STATIONS[cur].flow[k];
+  if(digits($('wi'+k).value)===b.code){sfx.unlock();award(k)}
+  else{sfx.bad();$('fb'+k).className='fb no';$('fb'+k).textContent='الرمز غير صحيح ❌ تأكدي منه مع معلمتك';}
+}
+function sendOpen(k){
+  const v=$('oa'+k).value.trim();
+  if(v.length<2){$('fb'+k).className='fb no';$('fb'+k).textContent='اكتبي إجابتك أولًا ✍️';return}
+  const ta=$('oa'+k);
+  if(v.length<15&&ta.dataset.nudged!==v){
+    ta.dataset.nudged=v;$('fb'+k).className='fb';$('fb'+k).style.color='#7b5cd6';
+    $('fb'+k).innerHTML='فكرة جميلة! 💜 هل تستطيعين إضافة <b>صفة</b> للخطوات أيضًا؟ (مثلًا: مرتبة، واضحة…)<br>أضيفيها، أو اضغطي "أرسلي إجابتي" مرة أخرى للمتابعة.';
+    return}
+  ts(k).ans=v;sfx.ok();$('fb'+k).className='fb ok';$('fb'+k).textContent='فكرة جميلة! 💜 لنرَ…';award(k);
+}
+
+/* ===== river puzzle ===== */
+let P=null;
+const NM={x:['🦊','الثعلب'],c:['🐔','الدجاجة'],g:['🌾','الحبوب']};
+const HINTS=['ابدئي بنقل <b>الدجاجة 🐔</b>، لأن الثعلب لا يأكل الحبوب.',
+ 'يمكن للمزارع أن <b>يُعيد شيئًا معه</b> في طريق العودة، وليس فقط أن يعود وحده!',
+ 'بعد أن تنقلي الثعلب إلى الضفة الثانية، <b>أعيدي الدجاجة معكِ</b> ثم انقلي الحبوب.'];
+function newP(){return {f:0,x:0,c:0,g:0,cargo:null,steps:[],lost:'',hist:[],hint:0,move:null}}
+function danger(st,side){
+  if(st.f===side)return '';
+  if(st.x===side&&st.c===side)return 'الثعلب مع الدجاجة';
+  if(st.c===side&&st.g===side)return 'الدجاجة مع الحبوب';
+  return '';
+}
+function drawPuzzle(k){
+  const b=STATIONS[cur].flow[k],el=$('t'+k),busy=!!P.lost;
+  const bank=side=>`<div class="bank"><span class="lbl">${side?'الضفة الثانية':'الضفة الأولى'}</span>
+     ${['x','c','g'].filter(i=>P[i]===side&&P.cargo!==i).map(i=>{
+       const can=P.f===side&&!busy;
+       return `<button class="item" ${can?`onclick="load('${i}',${k})"`:'disabled'} title="${NM[i][1]}">${NM[i][0]}</button>`}).join('')}
+     ${P.f===side&&!busy&&['x','c','g'].some(i=>P[i]===side&&P.cargo!==i)?'<span class="tapme">👆 اضغطي لوضعه في القارب</span>':''}</div>`;
+  // preview: what is left behind if she crosses now
+  let warn='';
+  if(!busy){const t={...P};if(t.cargo)t[t.cargo]=1-t.f;t.f=1-t.f;const d=danger(t,P.f);if(d)warn=`<div class="warn">⚠️ انتبهي: إذا عبرتِ الآن سيبقى <b>${d}</b> وحدهما!</div>`;}
+  const mv=P.move!=null?` m${P.f}`:'';P.move=null;
+  el.innerHTML=head(k,b)+`
+   <div class="river">${bank(0)}
+     <div class="water"><div class="boat p${P.f}${mv}"><span class="farmer">👨‍🌾</span>${P.cargo?`<button class="item" onclick="load(null,${k})" title="إنزال">${NM[P.cargo][0]}</button>`:''}</div></div>
+     ${bank(1)}</div>
+   ${busy?`<div class="lost">${P.lost}</div>
+     <div class="row"><button class="btn sun" style="flex:1" onclick="undo(${k})">↩️ تراجعي خطوة</button><button class="btn alt" onclick="P=newP();drawPuzzle(${k})">↺ من البداية</button></div>`:
+   `<div class="row"><button class="btn" style="flex:1" onclick="cross(${k})">⛵ اعبري ${P.cargo?'مع '+NM[P.cargo][1]:'وحدك'}</button>
+     <button class="btn alt" onclick="undo(${k})" ${P.hist.length?'':'disabled'}>↩️ تراجع</button></div>${warn}`}
+   <div class="row"><button class="btn alt" style="font-size:14px;padding:7px 14px" onclick="P.hint=Math.min(P.hint+1,${HINTS.length});drawPuzzle(${k})" ${P.hint>=HINTS.length?'disabled':''}>💡 تلميح ${P.hint?`(${P.hint}/${HINTS.length})`:''}</button></div>
+   ${P.hint?HINTS.slice(0,P.hint).map((h,n)=>`<div class="hintbox">💡 ${n+1}. ${h}</div>`).join(''):''}
+   <div class="log"><b>خطواتك:</b> ${P.steps.length?`<ol>${P.steps.map(x=>`<li>${x}</li>`).join('')}</ol>`:'لم تبدئي بعد — المزارع في القارب على الضفة الأولى'}</div>`;
+}
+function load(i,k){if(P.lost)return;sfx.tick();P.cargo=(P.cargo===i?null:i);drawPuzzle(k)}
+function undo(k){
+  if(!P.hist.length)return;
+  const h=P.hist.pop();Object.assign(P,h);P.steps=P.steps.slice(0,h.n);P.cargo=null;P.lost='';P.move=1;drawPuzzle(k);
+}
+function cross(k){
+  const from=P.f,to=1-from,dest=to?'الضفة الثانية':'الضفة الأولى';
+  P.hist.push({f:P.f,x:P.x,c:P.c,g:P.g,n:P.steps.length});
+  P.steps.push(P.cargo?`ينقل المزارع ${NM[P.cargo][1]} إلى ${dest}`:`يعبر المزارع وحده إلى ${dest}`);
+  if(P.cargo)P[P.cargo]=to;P.f=to;P.cargo=null;P.move=1;
+  const d=danger(P,from);
+  if(d)P.lost=d==='الثعلب مع الدجاجة'?'😱 أكل الثعلب الدجاجة! لا بأس… تراجعي خطوة وجرّبي شيئًا آخر.':'😱 أكلت الدجاجة الحبوب! لا بأس… تراجعي خطوة وجرّبي شيئًا آخر.';
+  if(P.lost)sfx.bad();else sfx.boat();
+  drawPuzzle(k);
+  if(!P.lost&&P.x&&P.c&&P.g&&P.f){ts(k).steps=P.steps.slice();confetti(20);
+    $('t'+k).insertAdjacentHTML('beforeend','<div class="fb ok">🎉 أحسنتِ! وصل الجميع بأمان. انظري إلى خطواتك: إنها مرتبة ومحددة وأوصلتك إلى الحل…</div>');
+    setTimeout(()=>award(k),1800);}
+}
+
+/* ===== finish ===== */
+function checkDone(fresh){
+  const st=STATIONS[cur];
+  const ok=st.flow.every((b,k)=>b.type==='learn'||ts(k).ok);if(!ok)return;
+  const first=!S.done.includes(cur);
+  if(first){S.done.push(cur);save();updPts();confetti(30);setTimeout(sfx.win,300)}
+  const last=cur===3;
+  $('endbox').innerHTML=`<div class="endbox">${last?
+   `<div style="font-size:40px">🏆</div><h2 style="font-size:24px">أحسنتِ يا ${esc(S.name)}! أنهيتِ الرحلة كاملة</h2>
+    <button class="btn" onclick="show('s-end');fillCert()">استلمي شهادتك</button>`:
+   `<div style="font-size:40px">🙋‍♀️</div><h2 style="font-size:23px">أحسنتِ! أنهيتِ محطة ${st.title}</h2>
+    <p>أخبري معلمتك أنكِ أنهيتِ المحطة <b>${cur+1}</b> لتعطيكِ <b>رقم السر</b> لفتح المحطة <b>${cur+2}</b>.</p>
+    <button class="btn" onclick="goMap()">🗺️ إلى الخريطة</button>`}</div>`;
+  if(first)setTimeout(()=>$('endbox').scrollIntoView({behavior:'smooth',block:'center'}),700);
+}
+function fillCert(){
+  $('cname').textContent=S.name;$('cpts').textContent=Math.round(S.pts);
+  const st=S.pts>=90?3:S.pts>=70?2:1;$('cstars').textContent='⭐'.repeat(st)+'☆'.repeat(3-st);
+  $('cdate').textContent=new Date().toLocaleDateString('ar-QA-u-nu-latn',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  confetti(40);setTimeout(sfx.fanfare,250);
+}
+function confetti(n){const e=['🎉','⭐','✨','🎊','💛'];for(let i=0;i<n;i++){const d=document.createElement('div');d.className='confetti';d.textContent=e[i%e.length];d.style.left=Math.random()*100+'vw';d.style.animationDelay=Math.random()*.8+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),3600)}}
+
+/* ===== animated background ===== */
+(function(){
+  const icons=['🤖','💻','⚙️','&lt;/&gt;','{ }','01','if','( )','🤖','10','x = 5','&lt;/&gt;','print','💡','{ }','🤖'];
+  let h='';
+  for(let i=0;i<26;i++){
+    const t=icons[i%icons.length],emoji=/\p{Extended_Pictographic}/u.test(t);
+    const size=emoji?16+Math.random()*14:13+Math.random()*9;
+    const o=emoji?(.14+Math.random()*.1):(.22+Math.random()*.15);
+    h+=`<span class="${emoji?'e':''}" style="left:${Math.random()*96}%;font-size:${size}px;--o:${o.toFixed(2)};--r:${(Math.random()*80-40).toFixed(0)}deg;--y:${(Math.random()*95).toFixed(0)}%;animation-duration:${(22+Math.random()*22).toFixed(1)}s;animation-delay:-${(Math.random()*40).toFixed(1)}s">${t}</span>`;
+  }
+  document.getElementById('bg').innerHTML=h;
+})();
+
+$('mute').textContent=MUTE?'🔇':'🔊';
+const SALT='qatar-algo-2026';
+function fnv(t){let h=0x811c9dc5;for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)>>>0}return h.toString(36)}
+function resultCode(){
+  const o={n:S.name,p:Math.round(S.pts),d:S.done.length,a1:(S.ts['0-1']||{}).ans||'',a2:(S.ts['1-0']||{}).ans||'',t:Date.now()};
+  const j=JSON.stringify(o);
+  const b=btoa(unescape(encodeURIComponent(j))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  return `${S.name} | ${o.p} نقطة | ${o.d}/4 محطات | #QC:${b}.${fnv(SALT+j)}`;
+}
+function openSend(){$('sendtxt').value=resultCode();$('sendfb').textContent='';$('send').classList.add('on')}
+function copySend(){
+  const t=$('sendtxt');
+  const done=()=>{$('sendfb').className='fb ok';$('sendfb').textContent='✅ تم النسخ! الصقيها الآن في محادثة الحصة';sfx.ok()};
+  try{navigator.clipboard.writeText(t.value).then(done,()=>{t.select();try{document.execCommand('copy');done()}catch(e){$('sendfb').textContent='حدّدي النص وانسخيه يدويًا'}})}
+  catch(e){t.select();try{document.execCommand('copy');done()}catch(e2){}}
+}
+function resetAll(btn){
+  if(!btn.dataset.sure){btn.dataset.sure='1';const t=btn.textContent;btn.textContent='⚠️ سيُحذف تقدّمك ونقاطك… اضغطي مرة أخرى للتأكيد';
+    setTimeout(()=>{if(btn.isConnected){delete btn.dataset.sure;btn.textContent=t}},4000);return}
+  try{localStorage.removeItem(KEY)}catch(e){}
+  S={name:'',unlocked:0,done:[],pts:0,ts:{}};$('nm').value='';$('nmfb').textContent='';
+  delete btn.dataset.sure;btn.textContent='🔄 ابدئي الرحلة من جديد';show('s-welcome');
+}
+if(S.name){goMap();sync()}
+</script>
+</body>
+</html>
