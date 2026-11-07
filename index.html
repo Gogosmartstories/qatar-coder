@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>رحلة المبرمجة في قطر</title>
+<script src="config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -362,9 +363,10 @@ function sync(){
   if(!S.sid){S.sid=Date.now().toString(36)+Math.random().toString(36).slice(2,10);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
   clearTimeout(syncT);
   syncT=setTimeout(()=>{
-    try{fetch('/api/submit',{method:'POST',headers:{'Content-Type':'application/json'},
+    const API=window.SHEET_URL||'';if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(API))return;
+    try{fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
       body:JSON.stringify({sid:S.sid,n:S.name,p:S.pts,d:S.done.length,a1:(S.ts['0-1']||{}).ans||'',a2:(S.ts['1-0']||{}).ans||''})})
-      .then(r=>{const d=$('live');if(d)d.style.display=r.ok?'inline-block':'none'}).catch(()=>{})}catch(e){}
+      .then(r=>r.json()).then(j=>{const d=$('live');if(d)d.style.display=j&&j.ok?'inline-block':'none'}).catch(()=>{})}catch(e){}
   },600);
 }
 const $=id=>document.getElementById(id);

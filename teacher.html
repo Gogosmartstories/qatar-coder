@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>لوحة المعلمة – رحلة المبرمجة في قطر</title>
+<script src="config.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--sea:#0e5f76;--sea2:#0a4557;--sand:#f6e7c8;--sand2:#ecd3a3;--coral:#ff6b4a;--sun:#ffc23d;--ink:#1d2b33;--muted:#5d6f78;--card:#fffaf0;--ok:#1f9d5c;--bad:#d6453a}
@@ -83,7 +84,7 @@ tr.top1 td{background:#fff3c4} tr.top2 td{background:#eef1f4} tr.top3 td{backgro
     <div class="card">
       <h3 style="color:var(--sea);font-size:22px">🔐 دخول المعلمة</h3>
       <div id="login">
-        <p style="margin:6px 0;color:var(--muted);line-height:1.7">أدخلي رقم المعلمة السري (TEACHER_KEY) لتظهر نتائج الطالبات مباشرة وأرقام السر.</p>
+        <p style="margin:6px 0;color:var(--muted);line-height:1.7">أدخلي رقم المعلمة السري (TEACHER_KEY في Apps Script) لتظهر نتائج الطالبات مباشرة وأرقام السر.</p>
         <input id="tk" type="password" style="font:inherit;font-size:18px;width:100%;padding:10px;border-radius:12px;border:2px solid var(--sand2);text-align:center" placeholder="الرقم السري للمعلمة" onkeydown="if(event.key==='Enter')login()">
         <div class="row"><button class="btn" onclick="login()">دخول</button><span class="msg" id="lmsg"></span></div>
       </div>
@@ -128,9 +129,11 @@ const normName=n=>n.trim().replace(/\s+/g,' ').replace(/[أإآ]/g,'ا').replace
 let R={};try{R=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
 let SRV=[],TK='',POLL=null;try{TK=localStorage.getItem('qc-tk')||''}catch(e){}
 async function fetchResults(method){
-  const r=await fetch('/api/results',{method:method||'GET',headers:{'x-teacher-key':TK},cache:'no-store'});
-  let j={};try{j=await r.json()}catch(e){}
-  if(!r.ok)throw new Error(j.error||('HTTP '+r.status));
+  const API=window.SHEET_URL||'';
+  if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(API))throw new Error('NO_URL');
+  const r=await fetch(API+'?key='+encodeURIComponent(TK)+(method==='DELETE'?'&action=clear':'')+'&_='+Date.now());
+  let j={};try{j=await r.json()}catch(e){throw new Error('NET')}
+  if(!j.ok)throw new Error(j.error||'NET');
   return j;
 }
 async function login(){
@@ -142,9 +145,9 @@ async function login(){
     $('login').style.display='none';$('logged').style.display='block';
     $('codes').innerHTML='<tr><th>الاستخدام</th><th>الرقم</th></tr>'+j.codes.map(c=>`<tr><td>${esc(c[0])}</td><td><b>${esc(c[1])}</b></td></tr>`).join('');
     SRV=j.results;render();stamp();
-    clearInterval(POLL);POLL=setInterval(poll,5000);
+    clearInterval(POLL);POLL=setInterval(poll,6000);
   }catch(e){
-    const m={WRONG_KEY:'الرقم السري غير صحيح',NO_TEACHER_KEY:'لم يُضبط TEACHER_KEY في Vercel بعد',NO_DB:'لم تُربط قاعدة البيانات (Upstash) في Vercel بعد'}[e.message]||'تعذّر الاتصال بالخادم (تأكدي أن الصفحة مفتوحة من رابط Vercel)';
+    const m={WRONG_KEY:'الرقم السري غير صحيح',NO_URL:'لم يُلصق رابط Apps Script في ملف config.js بعد'}[e.message]||'تعذّر الاتصال بـ Google Sheets (تأكدي من نشر Apps Script بصلاحية Anyone)';
     $('lmsg').style.color='var(--bad)';$('lmsg').textContent=m;
     if(e.message==='WRONG_KEY'){TK='';try{localStorage.removeItem('qc-tk')}catch(x){}}
   }
