@@ -213,10 +213,33 @@ function clearAll(btn){
   if(!btn.dataset.sure){btn.dataset.sure=1;btn.textContent='⚠️ اضغطي مرة أخرى لمسح كل النتائج';setTimeout(()=>{delete btn.dataset.sure;btn.textContent='🗑️ مسح الكل'},4000);return}
   R={};save();if(TK){fetchResults('DELETE').then(()=>{SRV=[];render()}).catch(()=>{})}SRV=[];render();delete btn.dataset.sure;btn.textContent='🗑️ مسح الكل';
 }
+/* ===== celebration sounds (Web Audio, no files) ===== */
+let AC=null;
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,at,d,type,v){const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain(),t=a.currentTime+at;
+  o.type=type||'triangle';o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v||.12,t+.02);
+  g.gain.setValueAtTime(v||.12,t+d*.7);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d+.05)}
+function noise(at,d,v,type,freq,shape){const a=ac();if(!a)return;const n=Math.max(1,Math.floor(a.sampleRate*d)),buf=a.createBuffer(1,n,a.sampleRate),ch=buf.getChannelData(0);
+  for(let i=0;i<n;i++){const x=i/n;ch[i]=(Math.random()*2-1)*(shape==='decay'?Math.pow(1-x,3):Math.sin(Math.PI*x))}
+  const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=buf;f.type=type||'bandpass';f.frequency.value=freq||1500;g.gain.value=v||.2;
+  s.connect(f).connect(g).connect(a.destination);s.start(a.currentTime+at)}
+function celebrate(){
+  if(!ac())return;
+  // drumroll (speeds up)
+  let t=0;for(let i=0;i<26;i++){noise(t,.06,.22+i*.008,'bandpass',220,'decay');t+=.075-i*.0012}
+  // cymbal crash + bass drum when gold appears
+  noise(t,1.6,.25,'highpass',5000,'decay');tone(70,t,.35,'sine',.35);
+  // fanfare
+  const F=[[523,0,.18],[523,.2,.18],[523,.4,.18],[659,.6,.5],[587,1.15,.18],[659,1.35,.18],[784,1.55,.9]];
+  F.forEach(([f,d,l])=>{tone(f,t+d,l,'triangle',.11);tone(f/2,t+d,l,'sawtooth',.025)});
+  [1047,1319,1568].forEach(f=>tone(f,t+2.5,1,'sine',.05));
+  // applause: many random claps
+  for(let i=0;i<220;i++)noise(t+.3+Math.random()*4.2,.03,.05+Math.random()*.08,'bandpass',900+Math.random()*1800,'decay');
+}
 function podium(){
   const L=sorted().slice(0,3),med=['🥇','🥈','🥉'];
   $('stage').innerHTML=L.length?L.map((o,i)=>`<div class="place g${i+1}"><div class="medal">${med[i]}</div><div class="who">${esc(o.n)}</div><div class="p">${o.p} نقطة</div><div class="block">${i+1}</div></div>`).join(''):'<p>لا توجد نتائج بعد</p>';
-  $('pod').classList.add('on');
+  $('pod').classList.add('on');celebrate();
   const e=['🎉','⭐','✨','🎊','💛'];for(let i=0;i<60;i++){const d=document.createElement('div');d.className='confetti';d.textContent=e[i%5];d.style.left=Math.random()*100+'vw';d.style.animationDelay=Math.random()*1.5+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),4800)}
 }
 render();
