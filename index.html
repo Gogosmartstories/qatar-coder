@@ -120,6 +120,84 @@ input.txt{font:inherit;font-size:20px;width:100%;padding:12px;border-radius:14px
 @keyframes floatUp{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:var(--o)}90%{opacity:var(--o)}100%{transform:translateY(-115vh) rotate(var(--r));opacity:0}}
 .wrap{position:relative;z-index:1}
 @media (prefers-reduced-motion:reduce){.bg span{animation:none;opacity:var(--o);bottom:auto;top:var(--y)}}
+/* ===== landscape full-screen layout ===== */
+html,body{height:100%}
+body{font-size:clamp(15px,1.15vw,19px);overflow:hidden}
+.wrap{max-width:none;height:100vh;padding:14px 22px;display:flex;flex-direction:column}
+.screen.on{display:flex;flex-direction:column;flex:1;min-height:0}
+.top{padding-left:56px}
+#mute{top:14px;bottom:auto!important}
+.top h1{font-size:clamp(22px,2vw,32px)}
+/* welcome */
+#s-welcome{justify-content:center;align-items:center}
+.welcome{max-width:1100px;width:100%;margin:auto;text-align:right;padding:clamp(18px,3vw,40px)}
+.wgrid{display:grid;grid-template-columns:1.15fr 1fr;gap:clamp(16px,3vw,44px);align-items:center}
+.welcome h1{font-size:clamp(30px,3.4vw,52px)!important}
+.welcome .goals{font-size:inherit;margin:0;padding:18px 22px;line-height:2}
+.wfoot{color:var(--muted);font-size:13px;margin-top:10px}
+/* map */
+.maprow{display:flex;align-items:center;gap:16px;margin-top:8px}
+.maprow .progress{flex:1;margin:0}
+.map{flex:1;min-height:0;display:flex}
+.map svg{width:100%;height:100%;margin:0}
+.mapbottom{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.mapbottom .hint-bar{flex:1;margin:0;font-size:clamp(14px,1.2vw,18px)}
+/* station */
+.st-top{gap:14px}
+.st-title{font-family:'Lalezar';font-size:clamp(20px,1.9vw,30px);white-space:nowrap}
+.stepper{flex:1;display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+.step{min-width:38px;height:38px;border-radius:99px;border:0;font:inherit;font-weight:800;font-size:15px;cursor:pointer;background:rgba(255,255,255,.18);color:#fff;padding:0 10px;display:grid;place-items:center}
+.step.done{background:var(--leaf)}
+.step.now{background:var(--sun);color:var(--ink);box-shadow:0 0 0 3px rgba(255,255,255,.6)}
+.step.lock{opacity:.35;cursor:not-allowed}
+.page{flex:1;min-height:0;overflow:auto;margin-top:10px;display:flex;padding:clamp(14px,2vw,28px)}
+.page>.inner{margin:auto;width:100%;max-width:1250px}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:10px}
+.nav #pgnum{color:#fff;font-weight:800;opacity:.85}
+.nav .btn{min-width:150px;font-size:clamp(15px,1.2vw,19px)}
+.btn.pulse{animation:pulseB 1.2s infinite;background:var(--ok);box-shadow:0 4px 0 #136b3d}
+@keyframes pulseB{50%{transform:scale(1.06)}}
+.storypage{display:grid;grid-template-columns:auto 1fr;gap:clamp(16px,3vw,40px);align-items:center}
+.storypage .bigicon{font-size:clamp(80px,10vw,150px);line-height:1}
+.storypage h2{font-size:clamp(28px,3vw,46px);color:var(--sea)}
+.storypage .story{font-size:clamp(17px,1.5vw,24px);line-height:2}
+.tasknum{display:inline-block;background:var(--sea);color:#fff;font-family:'Lalezar';font-size:clamp(18px,1.6vw,26px);border-radius:14px;padding:4px 18px;margin-bottom:8px}
+.page .task{margin:0;border-width:3px;padding:clamp(14px,1.6vw,24px)}
+.page .task h4{font-size:clamp(17px,1.5vw,24px)}
+.page .learn{margin:0;font-size:clamp(16px,1.35vw,21px);padding:clamp(14px,2vw,28px)}
+.page .learn h3{font-size:clamp(22px,2vw,32px)}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2.4vw,36px);align-items:center}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts .opt{margin:0;font-size:clamp(16px,1.35vw,21px);padding:14px}
+.matchgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
+.ordergrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.ordergrid .colh{font-weight:800;color:var(--muted);margin-bottom:6px}
+.ordergrid .seqbox{margin:0;min-height:100%}
+.chip{font-size:clamp(14px,1.2vw,18px)}
+.page .chip{padding:6px 12px}.page .pool,.page .seq{gap:5px}.page .seq .chip:before{width:22px;height:22px}
+.page .task h4{margin-bottom:6px}.page .tasknum{margin-bottom:6px}
+.page textarea{min-height:22vh;font-size:clamp(16px,1.3vw,20px)}
+.pz{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start}
+.pz .rules{background:var(--sand);border-radius:12px;padding:10px 12px;line-height:1.8;font-size:.92em}
+.pz .river{min-height:200px;margin-top:0}
+.page .flow{max-height:52vh;width:auto;max-width:100%}
+.endpage{text-align:center;font-size:clamp(17px,1.5vw,23px);line-height:1.9}
+.endpage .big{font-size:clamp(60px,7vw,100px)}
+.endpage h2{font-size:clamp(26px,2.6vw,40px);color:var(--sea)}
+/* certificate */
+#s-end{justify-content:center}
+.cert{max-width:760px;width:100%;margin:auto;padding:clamp(16px,2.4vw,30px)}
+.cert p{margin:6px 0}
+@media (max-width:820px){
+  body{overflow:auto}.wrap{height:auto;min-height:100vh}
+  .screen.on{flex:none}
+  .wgrid,.cols2,.pz,.storypage,.ordergrid{grid-template-columns:1fr}
+  .opts,.matchgrid{grid-template-columns:1fr}
+  .stepper{order:5;flex-basis:100%}
+  .st-top{flex-wrap:wrap}
+  .page{overflow:visible}
+  .map{min-height:56vw}
+}
 </style>
 </head>
 <body>
@@ -129,45 +207,62 @@ input.txt{font:inherit;font-size:20px;width:100%;padding:12px;border-radius:14px
 
   <section id="s-welcome" class="screen on">
     <div class="card welcome">
-      <div style="font-size:54px">🧭🇶🇦</div>
-      <h1 style="font-size:32px;color:var(--sea)">رحلة المبرمجة في قطر</h1>
-      <p style="line-height:1.8;margin:8px 0">استعدّي لرحلة عبر <b>4 محطات</b> في قطر! في كل محطة قصة ولغز ومهمة، وعند إنهائها تحصلين على <b>رقم السر من معلمتك</b> لتنتقلي إلى المحطة التالية وتجمعي النقاط.</p>
-      <div class="goals">
-        🎯 <b>في نهاية الرحلة ستتمكنين من:</b><br>
-        1. توضيح مفهوم الخوارزمية<br>
-        2. توضيح مفهوم المخطط الانسيابي ورموزه<br>
-        3. ذكر مراحل إنشاء برنامج لحل مشكلة محددة<br>
-        4. حل المشكلات باستخدام الخوارزمية والمخطط الانسيابي
+      <div class="wgrid">
+        <div>
+          <div style="font-size:clamp(46px,5vw,76px)">🧭🇶🇦</div>
+          <h1 style="color:var(--sea)">رحلة المبرمجة في قطر</h1>
+          <p style="line-height:1.9;margin:10px 0">استعدّي لرحلة عبر <b>4 محطات</b> في قطر! في كل محطة قصة ولغز ومهام، وعند إنهائها تحصلين على <b>رقم السر من معلمتك</b> لتنتقلي إلى المحطة التالية وتجمعي النقاط.</p>
+          <input id="nm" class="txt" style="letter-spacing:0" placeholder="اكتبي اسمك هنا ✍️" maxlength="30" onkeydown="if(event.key==='Enter')start()">
+          <button class="btn sun wide" style="font-size:1.15em;padding:14px" onclick="start()">🚀 ابدئي الرحلة</button>
+          <div class="fb no" id="nmfb"></div>
+        </div>
+        <div>
+          <div class="goals">
+            🎯 <b>في نهاية الرحلة ستتمكنين من:</b><br>
+            1. توضيح مفهوم الخوارزمية<br>
+            2. توضيح مفهوم المخطط الانسيابي ورموزه<br>
+            3. ذكر مراحل إنشاء برنامج لحل مشكلة محددة<br>
+            4. حل المشكلات باستخدام الخوارزمية والمخطط الانسيابي
+          </div>
+          <div class="wfoot">الحوسبة وتكنولوجيا المعلومات • الصف التاسع • خطوات حل المشكلات</div>
+        </div>
       </div>
-      <input id="nm" class="txt" style="letter-spacing:0" placeholder="اكتبي اسمك هنا ✍️" maxlength="30">
-      <button class="btn sun wide" onclick="start()">🚀 ابدئي الرحلة</button>
-      <div class="fb no" id="nmfb"></div>
     </div>
   </section>
 
   <section id="s-map" class="screen">
     <div class="top">
-      <div><h1>خريطة الرحلة</h1><small id="hello"></small><small id="live" style="display:none;background:rgba(255,255,255,.15);border-radius:99px;padding:1px 8px;margin-top:3px">🟢 نتيجتك تصل لمعلمتك تلقائيًا</small></div>
+      <div><h1>🗺️ خريطة الرحلة</h1><small id="hello"></small><small id="live" style="display:none;background:rgba(255,255,255,.15);border-radius:99px;padding:1px 8px;margin-top:3px">🟢 نتيجتك تصل لمعلمتك تلقائيًا</small></div>
+      <div class="maprow" style="flex:1;margin:0 10px"><div class="progress"><i id="bar"></i></div></div>
       <div class="score"><b id="pts">0</b>نقطة</div>
     </div>
-    <div class="progress"><i id="bar"></i></div>
     <div class="map" id="map"></div>
-    <div class="hint-bar" id="maphint"></div>
-    <div style="text-align:center;margin-top:12px"><button class="btn sun" style="margin-bottom:10px" onclick="openSend()">📤 أرسلي نتيجتي لمعلمتي</button><br><button class="btn alt reset" style="font-size:14px;padding:8px 16px" onclick="resetAll(this)">🔄 ابدئي الرحلة من جديد</button></div>
+    <div class="mapbottom">
+      <div class="hint-bar" id="maphint"></div>
+      <button class="btn sun" onclick="openSend()">📤 أرسلي نتيجتي لمعلمتي</button>
+      <button class="btn alt reset" style="font-size:14px;padding:9px 14px" onclick="resetAll(this)">🔄 ابدئي الرحلة من جديد</button>
+    </div>
   </section>
 
   <section id="s-station" class="screen">
-    <div class="top">
+    <div class="top st-top">
       <button class="btn alt" onclick="goMap()">🗺️ الخريطة</button>
+      <div class="st-title" id="sttitle"></div>
+      <div class="stepper" id="stepper"></div>
       <div class="score"><b id="pts2">0</b>نقطة</div>
     </div>
-    <div class="card" id="stcard"></div>
+    <div class="page card" id="stcard"></div>
+    <div class="nav">
+      <button class="btn alt" id="prevb" onclick="goPage(-1)">➡️ السابق</button>
+      <span id="pgnum"></span>
+      <button class="btn" id="nextb" onclick="goPage(1)">التالي ⬅️</button>
+    </div>
   </section>
 
   <section id="s-end" class="screen">
     <div class="card cert">
-      <div style="font-size:50px">🏆</div>
-      <h2 style="color:var(--sea);font-size:26px">شهادة بطلة حل المشكلات</h2>
+      <div style="font-size:44px">🏆</div>
+      <h2 style="color:var(--sea);font-size:clamp(24px,2.4vw,34px)">شهادة بطلة حل المشكلات</h2>
       <p>تشهد رحلة المبرمجة في قطر أن الطالبة</p>
       <div class="name" id="cname"></div>
       <p>أتمّت المحطات الأربع: فويرط • القرم • واحة العلوم • مزرعة الشمال</p>
@@ -175,12 +270,14 @@ input.txt{font:inherit;font-size:20px;width:100%;padding:12px;border-radius:14px
       <div>من 100 نقطة</div>
       <div class="stars" id="cstars"></div>
       <p style="font-size:13px;color:var(--muted)" id="cdate"></p>
-      <button class="btn sun wide" style="margin:8px 0" onclick="openSend()">📤 أرسلي نتيجتي لمعلمتي</button>
-      <div class="row" style="justify-content:center"><button class="btn alt" onclick="goMap()">العودة للخريطة</button><button class="btn alt reset" onclick="resetAll(this)">🔄 ابدئي من جديد</button></div>
+      <div class="row" style="justify-content:center">
+        <button class="btn sun" onclick="openSend()">📤 أرسلي نتيجتي لمعلمتي</button>
+        <button class="btn alt" onclick="goMap()">العودة للخريطة</button>
+        <button class="btn alt reset" onclick="resetAll(this)">🔄 ابدئي من جديد</button>
+      </div>
     </div>
   </section>
-
-  <div class="foot">الحوسبة وتكنولوجيا المعلومات • الصف التاسع • خطوات حل المشكلات</div>
+</div>
 </div>
 
 <div class="modal" id="send">
@@ -247,7 +344,8 @@ const STATIONS=[
   ⚠️ وإذا تُركت الدجاجة مع الحبوب وحدهما <b>ستأكل الدجاجة الحبوب</b>.<br>
   🤔 كيف يمكنه نقل الجميع إلى الضفة الثانية بأمان؟`,
   flow:[
-    {type:'puzzle',q:'ساعدي المزارع! اضغطي على ما تريدين وضعه في القارب، ثم اضغطي "اعبري النهر".'},
+    {type:'puzzle',q:'ساعدي المزارع! اضغطي على ما تريدين وضعه في القارب، ثم اضغطي "اعبري".',
+     rules:'🛶 القارب يتّسع للمزارع <b>وشيء واحد</b> فقط<br>⚠️ لا يُترك <b>الثعلب مع الدجاجة</b> وحدهما<br>⚠️ لا تُترك <b>الدجاجة مع الحبوب</b> وحدهما'},
     {type:'open',q:'لو طلب منكِ المزارع أن تكتبي له طريقة الحل في رسالة ليتّبعها غدًا وحده دون أن يخطئ، <b>ما الصفات التي يجب أن تتوفر في هذه الخطوات؟</b> وما الاسم الذي تقترحينه لها؟',ph:'اكتبي أفكارك هنا… (مثلًا: يجب أن تكون الخطوات…)'},
     {type:'learn',html:`<h3>💡 ما وصفتِه هو الخوارزمية!</h3>
       <div class="def">الخوارزمية: مجموعة من الخطوات المنطقية المتسلسلة والمحددة التي نتبعها لحل مشكلة ما والوصول إلى النتيجة.</div>
@@ -266,13 +364,13 @@ const STATIONS=[
   story:`في <b>محمية أشجار القرم</b> بالذخيرة، يأخذ المرشد مجموعة من الزوار في جولة بالقارب بين الأشجار. الزوار من دول مختلفة ولا يفهمون لغة واحدة… فأعطاهم المرشد <b>لوحة عليها أشكال وأسهم فقط</b>، ففهم الجميع المسار وخطوات الجولة دون كلمة واحدة! 🛶`,
   flow:[
     {type:'open',q:'لماذا فهم الزوار الخطوات من الأشكال والأسهم أسرع من الكلام المكتوب؟ ولو أردتِ تحويل <b>خوارزمية حساب المتوسط</b> إلى رسم، <b>ماذا ستستخدمين؟</b> وكيف ستميّزين البداية والإدخال والحساب؟',ph:'اكتبي أفكارك هنا…'},
-    {type:'learn',html:`<h3>💡 هذه الفكرة اسمها المخطط الانسيابي!</h3>
+    {type:'learn',html:`<div class="cols2"><div><h3>💡 هذه الفكرة اسمها المخطط الانسيابي!</h3>
       <div class="def">المخطط الانسيابي: تمثيل بياني (رسم) لخطوات الخوارزمية باستخدام أشكال ورموز متفق عليها، تربط بينها أسهم توضّح اتجاه سير الحل.</div>
+      <div><b>➡️ الأسهم:</b> تبيّن اتجاه انتقال الخطوات.</div></div><div>
       <div class="match">${SYM.oval}<div><b>شكل بيضاوي:</b> البداية / النهاية</div></div>
       <div class="match">${SYM.para}<div><b>متوازي أضلاع:</b> إدخال / إخراج</div></div>
       <div class="match">${SYM.rect}<div><b>مستطيل:</b> عملية (معالجة / حساب)</div></div>
-      <div class="match">${SYM.diam}<div><b>معيّن:</b> قرار (سؤال إجابته نعم / لا)</div></div>
-      <div><b>➡️ الأسهم:</b> تبيّن اتجاه انتقال الخطوات.</div>`},
+      <div class="match">${SYM.diam}<div><b>معيّن:</b> قرار (سؤال إجابته نعم / لا)</div></div></div></div>`},
     {type:'match',q:'اختاري معنى كل رمز من لوحة المرشد:',
      pairs:[['diam','قرار'],['oval','بداية / نهاية'],['rect','عملية'],['para','إدخال / إخراج']]},
     {type:'mcq',q:'ما فائدة المخطط الانسيابي؟',
@@ -322,7 +420,7 @@ const STATIONS=[
      opts:[SYM.para+' متوازي أضلاع',SYM.rect+' مستطيل',SYM.diam+' معيّن',SYM.oval+' بيضاوي'],a:1},
     {type:'mcq',q:'🧪 اختبري البرنامج: إذا أدخل المزارع الطول = <b>8</b> والعرض = <b>5</b>، فماذا سيطبع البرنامج؟',
      opts:['13','26','40','85'],a:2},
-    {type:'learn',html:`<h3>🌟 المخطط الانسيابي للحل</h3>${FLOW_AREA}`}
+    {type:'learn',html:`<div class="cols2"><div><h3>🌟 المخطط الانسيابي للحل</h3><p>هذا هو المخطط الانسيابي لبرنامج حساب مساحة المستطيل. لاحظي:</p><ul><li>البيضاوي للبداية والنهاية</li><li>متوازي الأضلاع للإدخال والإخراج</li><li>المستطيل للعملية (الحساب)</li><li>الأسهم توضّح اتجاه الخطوات</li></ul></div><div>${FLOW_AREA}</div></div>`}
   ]
 }];
 const PER=25;
@@ -383,34 +481,34 @@ function goMap(){show('s-map');drawMap()}
 function updPts(){const p=Math.round(S.pts);$('pts').textContent=p;$('pts2').textContent=p;$('bar').style.width=(S.done.length*25)+'%'}
 
 /* ===== map ===== */
-const POS=[[95,450],[262,355],[100,240],[255,120]];
+const POS=[[830,355],[640,175],[420,345],[230,185]];
 function drawMap(){
   updPts();
   $('hello').textContent='المبرمجة: '+S.name;
-  const path='M60,500 C70,470 80,460 95,450 S230,400 262,355 S140,280 100,240 S200,160 255,120 S290,60 300,45';
+  const path='M935,470 C900,430 860,400 830,355 S700,195 640,175 S470,320 420,345 S270,215 230,185 S120,300 130,350';
   let g='';
   POS.forEach((p,i)=>{
     const done=S.done.includes(i),open=i<S.unlocked,cur=open&&!done;
     const fill=done?'#2f9e6e':open?'#ff6b4a':'#9aa7ad';
     g+=`<g class="st" onclick="openStation(${i})">
-      ${cur?`<circle class="halo" cx="${p[0]}" cy="${p[1]}" r="30" fill="${fill}"/>`:''}
-      <circle cx="${p[0]}" cy="${p[1]}" r="30" fill="#fff" stroke="${fill}" stroke-width="6"/>
-      <text x="${p[0]}" y="${p[1]+9}" text-anchor="middle" font-size="26">${done?'✅':open?STATIONS[i].icon:'🔒'}</text>
-      <rect x="${p[0]-72}" y="${p[1]+36}" width="144" height="26" rx="13" fill="${fill}"/>
-      <text x="${p[0]}" y="${p[1]+54}" text-anchor="middle" fill="#fff" font-family="Tajawal" font-weight="800" font-size="14">${i+1}. ${STATIONS[i].title}</text>
+      ${cur?`<circle class="halo" cx="${p[0]}" cy="${p[1]}" r="40" fill="${fill}"/>`:''}
+      <circle cx="${p[0]}" cy="${p[1]}" r="40" fill="#fff" stroke="${fill}" stroke-width="7"/>
+      <text x="${p[0]}" y="${p[1]+12}" text-anchor="middle" font-size="34">${done?'✅':open?STATIONS[i].icon:'🔒'}</text>
+      <rect x="${p[0]-95}" y="${p[1]+48}" width="190" height="34" rx="17" fill="${fill}"/>
+      <text x="${p[0]}" y="${p[1]+71}" text-anchor="middle" fill="#fff" font-family="Tajawal" font-weight="800" font-size="19">${i+1}. ${STATIONS[i].title}</text>
     </g>`;
   });
   const fin=S.done.length===4;
-  $('map').innerHTML=`<svg viewBox="0 0 360 540">
-   <defs><radialGradient id="isl" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#f9edd2"/><stop offset=".85" stop-color="#ecd3a3"/><stop offset="1" stop-color="#d9b97c"/></radialGradient></defs>
-   <path d="M40,90 C20,200 10,330 30,440 C45,520 150,535 230,520 C330,505 350,420 345,300 C340,180 350,70 270,30 C180,-5 60,10 40,90Z" fill="#7cc6d6" opacity=".35" transform="translate(0,4)"/>
-   <path d="M50,95 C30,200 25,330 42,430 C55,505 150,518 228,505 C320,490 335,410 330,300 C325,185 335,85 265,45 C185,10 70,25 50,95Z" fill="url(#isl)"/>
-   <text x="300" y="250" font-size="34">🌴</text><text x="40" y="350" font-size="30">🌴</text><text x="180" y="300" font-size="22">🐪</text>
-   <text x="160" y="90" font-size="24">🏜️</text><text x="210" y="470" font-size="22">🐚</text>
-   <text x="15" y="60" font-size="24">🐟</text><text x="320" y="520" font-size="24">⛵</text>
-   <path d="${path}" fill="none" stroke="#a5743a" stroke-width="5" stroke-dasharray="2 12" stroke-linecap="round"/>
-   <text x="44" y="520" font-size="26">🛶</text>
-   <text x="288" y="50" font-size="30" class="st" onclick="${fin?"show('s-end');fillCert()":''}">${fin?'🏆':'🏁'}</text>
+  $('map').innerHTML=`<svg viewBox="0 0 1000 520" preserveAspectRatio="xMidYMid meet">
+   <defs><radialGradient id="isl" cx="50%" cy="50%" r="60%"><stop offset="0" stop-color="#f9edd2"/><stop offset=".85" stop-color="#ecd3a3"/><stop offset="1" stop-color="#d9b97c"/></radialGradient></defs>
+   <path d="M80,140 C45,250 60,390 150,455 C270,530 520,510 710,500 C870,490 975,425 962,300 C950,165 905,60 760,40 C560,15 300,28 175,50 C110,62 92,100 80,140Z" fill="#7cc6d6" opacity=".35" transform="translate(0,6)"/>
+   <path d="M95,145 C62,250 76,380 160,442 C275,515 520,495 705,486 C860,476 955,415 945,300 C935,175 892,75 755,55 C560,30 305,42 182,63 C122,74 106,108 95,145Z" fill="url(#isl)"/>
+   <text x="505" y="120" font-size="42">🌴</text><text x="300" y="440" font-size="40">🌴</text><text x="880" y="200" font-size="40">🌴</text>
+   <text x="530" y="450" font-size="32">🐪</text><text x="380" y="140" font-size="34">🏜️</text><text x="700" y="440" font-size="28">🐚</text>
+   <text x="18" y="70" font-size="30">🐟</text><text x="955" y="45" font-size="28">🐟</text><text x="20" y="500" font-size="32">⛵</text>
+   <path d="${path}" fill="none" stroke="#a5743a" stroke-width="7" stroke-dasharray="2 16" stroke-linecap="round"/>
+   <text x="915" y="500" font-size="36">🛶</text>
+   <text x="105" y="372" font-size="52" class="st" onclick="${fin?"show('s-end');fillCert()":''}">${fin?'🏆':'🏁'}</text>
    ${g}</svg>`;
   const n=S.done.length+1;
   $('maphint').innerHTML=fin?'🎉 أنهيتِ الرحلة! اضغطي على الكأس 🏆 لرؤية شهادتك':
@@ -438,30 +536,82 @@ $('pw').addEventListener('keydown',e=>{if(e.key==='Enter')tryPass()});
 /* ===== station ===== */
 let cur=null;
 function ts(k){const id=cur+'-'+k;if(!S.ts[id])S.ts[id]={ok:false,tries:0};return S.ts[id]}
-function renderStation(i,focusK){
-  cur=i;const st=STATIONS[i];
-  let h=`<span class="badge">المحطة ${i+1} من 4</span>
-   <h2 style="font-size:28px;color:var(--sea);margin-top:6px">${st.icon} ${st.title}</h2>
-   <div class="story">${st.story}</div>`;
-  const shown=[];
-  for(let k=0;k<st.flow.length;k++){
-    const b=st.flow[k];
-    if(b.type==='learn'){h+=`<div class="learn" id="t${k}">${b.html}</div>`;continue}
-    h+=`<div class="task" id="t${k}"></div>`;shown.push(k);
-    if(!ts(k).ok)break;
-  }
-  h+=`<div id="endbox"></div>`;
-  $('stcard').innerHTML=h;
-  shown.forEach(renderTask);
-  updPts();checkDone(false);
+let PG=[],pi=0;
+function pagesOf(i){
+  const L=[{kind:'story'}];let n=0;
+  STATIONS[i].flow.forEach((b,k)=>L.push(b.type==='learn'?{kind:'learn',k}:{kind:'task',k,num:++n}));
+  L.push({kind:'end'});L.total=n;return L;
+}
+function okUpTo(p){for(let q=0;q<p;q++){const x=PG[q];if(x.kind==='task'&&!ts(x.k).ok)return false}return true}
+function renderStation(i){
+  cur=i;PG=pagesOf(i);
+  let p=PG.findIndex(x=>x.kind==='task'&&!ts(x.k).ok);
+  if(p<0)p=PG.length-1;
+  else if(!PG.some(x=>x.kind==='task'&&ts(x.k).ok))p=0;
+  else while(p>0&&PG[p-1].kind==='learn')p--;
+  S.pg=S.pg||{};
+  if(S.pg[i]!=null&&S.pg[i]<PG.length&&okUpTo(S.pg[i]))p=S.pg[i];
+  pi=p;
   if(!$('s-station').classList.contains('on'))show('s-station');
-  if(focusK!=null){const nx=$('t'+(focusK+1));if(nx)setTimeout(()=>nx.scrollIntoView({behavior:'smooth',block:'start'}),120)}
+  renderPage();
+}
+function goPage(d){
+  const q=pi+d;if(q<0||q>=PG.length)return;
+  if(d>0&&!okUpTo(q))return;
+  pi=q;sfx.tick();renderPage();
+}
+function goTo(q){if(q!==pi&&okUpTo(q)){pi=q;sfx.tick();renderPage()}}
+function renderPage(){
+  const st=STATIONS[cur],x=PG[pi];
+  S.pg=S.pg||{};S.pg[cur]=pi;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  $('sttitle').textContent=`${st.icon} المحطة ${cur+1}: ${st.title}`;
+  $('stepper').innerHTML=PG.map((y,q)=>{
+    const lab=y.kind==='story'?'📜':y.kind==='learn'?'💡':y.kind==='end'?'🏁':y.num;
+    const cls=q===pi?'now':!okUpTo(q)?'lock':(y.kind==='task'&&ts(y.k).ok)?'done':'';
+    const tip=y.kind==='story'?'القصة':y.kind==='learn'?'شرح':y.kind==='end'?'نهاية المحطة':'المهمة '+y.num;
+    return `<button class="step ${cls}" title="${tip}" onclick="goTo(${q})">${lab}</button>`}).join('');
+  let h='';
+  if(x.kind==='story'){
+    h=`<div class="storypage"><div class="bigicon">${st.icon}</div><div>
+      <span class="badge">المحطة ${cur+1} من 4</span><h2>${st.title}</h2><div class="story">${st.story}</div></div></div>`;
+  }else if(x.kind==='learn'){
+    h=`<div class="learn">${st.flow[x.k].html}</div>`;
+  }else if(x.kind==='task'){
+    h=`<div class="tasknum">المهمة ${x.num} من ${PG.total}</div><div class="task" id="t${x.k}"></div>`;
+  }else{
+    const last=cur===3;
+    h=`<div class="endpage">${last?
+     `<div class="big">🏆</div><h2>أحسنتِ يا ${esc(S.name)}! أنهيتِ الرحلة كاملة</h2>
+      <p>جمعتِ <b>${Math.round(S.pts)}</b> نقطة من 100</p>
+      <button class="btn sun" style="font-size:1.1em" onclick="show('s-end');fillCert()">🎓 استلمي شهادتك</button>`:
+     `<div class="big">🙋‍♀️</div><h2>أحسنتِ! أنهيتِ محطة ${st.title}</h2>
+      <p>أخبري معلمتك أنكِ أنهيتِ المحطة <b>${cur+1}</b> لتعطيكِ <b>رقم السر</b> لفتح المحطة <b>${cur+2}</b>.</p>
+      <button class="btn" style="font-size:1.1em" onclick="goMap()">🗺️ إلى الخريطة</button>`}</div>`;
+  }
+  $('stcard').innerHTML=`<div class="inner">${h}</div>`;
+  $('stcard').scrollTop=0;
+  if(x.kind==='task')renderTask(x.k);
+  updPts();updNav();
+}
+function updNav(){
+  const x=PG[pi],nb=$('nextb');
+  $('prevb').disabled=pi===0;
+  $('pgnum').textContent=`${pi+1} / ${PG.length}`;
+  nb.style.visibility=x.kind==='end'?'hidden':'visible';
+  const ready=okUpTo(pi+1);
+  nb.disabled=!ready;
+  nb.classList.toggle('pulse',x.kind==='task'&&ready);
+  const nx=PG[pi+1];
+  nb.textContent=x.kind==='story'?'ابدئي ⬅️':nx&&nx.kind==='end'?'إنهاء المحطة 🏁':'التالي ⬅️';
 }
 function award(k){
   const s=ts(k);if(s.ok)return;s.ok=true;
   const full=PER/scored(cur),got=Math.max(full*0.4,full-s.tries*full/4);
-  s.got=got;S.pts+=got;save();
-  setTimeout(()=>renderStation(cur,k),650);
+  s.got=got;S.pts+=got;
+  const all=STATIONS[cur].flow.every((b,j)=>b.type==='learn'||ts(j).ok);
+  if(all&&!S.done.includes(cur)){S.done.push(cur);setTimeout(()=>{confetti(30);sfx.win()},500)}
+  save();
+  setTimeout(()=>{if(PG[pi]&&PG[pi].k===k){renderTask(k);updNav()}updPts()},650);
 }
 function miss(k){ts(k).tries++;save()}
 const TAGS={mcq:'🎯 مهمة',order:'🎯 مهمة',match:'🎯 مهمة',open:'💭 سؤال تفكير إبداعي',puzzle:'🧩 لغز',work:'📝 ورقة العمل'};
@@ -476,18 +626,20 @@ function renderTask(k){
     if(b.type==='open')extra=`<div class="myans">${esc(s.ans||'')}</div>`;
     if(b.type==='puzzle')extra=`<div class="log"><b>خطواتك للحل:</b><ol>${(s.steps||[]).map(x=>`<li>${x}</li>`).join('')}</ol></div>`;
     if(b.type==='order')extra=`<div class="log"><ol>${b.items.map(x=>`<li>${x}</li>`).join('')}</ol></div>`;
-    if(b.type==='work')extra=b.after?`<div style="margin-top:8px">${b.after}</div>`:'';
-    el.innerHTML=head(k,b)+extra+`<div class="done-note">✅ أُنجزت (+${Math.round(s.got*10)/10} نقطة)</div>`;
+    const note=`<div class="done-note">✅ أُنجزت (+${Math.round(s.got*10)/10} نقطة) — اضغطي «التالي» للمتابعة</div>`;
+    if(b.type==='work'&&b.after){el.innerHTML=`<div class="cols2"><div>${head(k,b)}${note}</div><div>${b.after}</div></div>`;return}
+    if(b.type==='puzzle'||b.type==='order'){el.innerHTML=`<div class="cols2"><div>${head(k,b)}${note}</div><div>${extra}</div></div>`;return}
+    el.innerHTML=head(k,b)+extra+note;
     return;
   }
   if(b.type==='mcq'){
-    el.innerHTML=head(k,b)+b.opts.map((o,j)=>`<button class="opt" onclick="ansMcq(${k},${j},this)">${o}</button>`).join('')+`<div class="fb" id="fb${k}"></div>`;
+    el.innerHTML=head(k,b)+`<div class="opts">`+b.opts.map((o,j)=>`<button class="opt" onclick="ansMcq(${k},${j},this)">${o}</button>`).join('')+`</div><div class="fb" id="fb${k}"></div>`;
   }else if(b.type==='order'){
     el.dataset.seq='[]';el.dataset.sh=JSON.stringify(b.items.map((x,j)=>j).sort(()=>Math.random()-.5));
     drawOrder(k);
   }else if(b.type==='match'){
     const opts=[...new Set(b.pairs.map(p=>p[1]))];
-    el.innerHTML=head(k,b)+b.pairs.map((p,j)=>`<div class="match">${SYM[p[0]]}<select id="m${k}-${j}"><option value="">— اختاري —</option>${opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`).join('')+
+    el.innerHTML=head(k,b)+`<div class="matchgrid">`+b.pairs.map((p,j)=>`<div class="match">${SYM[p[0]]}<select id="m${k}-${j}"><option value="">— اختاري —</option>${opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`).join('')+`</div>`+
       `<button class="btn" onclick="chkMatch(${k})">تحقّقي ✔</button><div class="fb" id="fb${k}"></div>`;
   }else if(b.type==='open'){
     el.innerHTML=head(k,b)+`<textarea id="oa${k}" placeholder="${b.ph||''}"></textarea>
@@ -512,8 +664,10 @@ function drawOrder(k){
   const b=STATIONS[cur].flow[k],el=$('t'+k);
   const seq=JSON.parse(el.dataset.seq),sh=JSON.parse(el.dataset.sh),pool=sh.filter(j=>!seq.includes(j));
   el.innerHTML=head(k,b)+`
-   <div class="pool">${pool.map(j=>`<button class="chip" onclick="pick(${k},${j})">${b.items[j]}</button>`).join('')}</div>
-   <div class="seqbox"><div class="seq">${seq.length?seq.map((j,n)=>`<button class="chip" data-n="${n+1}" onclick="unpick(${k},${j})">${b.items[j]}</button>`).join(''):'<span class="empty">⬇️ ستظهر الخطوات هنا بالترتيب الذي تختارينه (اضغطي على خطوة لإزالتها)</span>'}</div></div>
+   <div class="ordergrid"><div><div class="colh">👆 الخطوات (اضغطي بالترتيب)</div>
+   <div class="pool">${pool.length?pool.map(j=>`<button class="chip" onclick="pick(${k},${j})">${b.items[j]}</button>`).join(''):'<span class="empty" style="color:var(--muted)">✔ اخترتِ كل الخطوات</span>'}</div></div>
+   <div><div class="colh">🔢 ترتيبك</div>
+   <div class="seqbox"><div class="seq">${seq.length?seq.map((j,n)=>`<button class="chip" data-n="${n+1}" onclick="unpick(${k},${j})">${b.items[j]}</button>`).join(''):'<span class="empty">ستظهر الخطوات هنا بالترتيب الذي تختارينه (اضغطي على خطوة لإزالتها)</span>'}</div></div></div></div>
    <div class="row"><button class="btn" onclick="chkOrder(${k})" ${pool.length?'disabled':''}>تحقّقي ✔</button><button class="btn alt" onclick="resetOrder(${k})">↺ من جديد</button></div>
    <div class="fb" id="fb${k}"></div>`;
 }
@@ -571,7 +725,7 @@ function drawPuzzle(k){
   let warn='';
   if(!busy){const t={...P};if(t.cargo)t[t.cargo]=1-t.f;t.f=1-t.f;const d=danger(t,P.f);if(d)warn=`<div class="warn">⚠️ انتبهي: إذا عبرتِ الآن سيبقى <b>${d}</b> وحدهما!</div>`;}
   const mv=P.move!=null?` m${P.f}`:'';P.move=null;
-  el.innerHTML=head(k,b)+`
+  el.innerHTML=head(k,b)+`<div class="pz"><div>
    <div class="river">${bank(0)}
      <div class="water"><div class="boat p${P.f}${mv}"><span class="farmer">👨‍🌾</span>${P.cargo?`<button class="item" onclick="load(null,${k})" title="إنزال">${NM[P.cargo][0]}</button>`:''}</div></div>
      ${bank(1)}</div>
@@ -579,9 +733,10 @@ function drawPuzzle(k){
      <div class="row"><button class="btn sun" style="flex:1" onclick="undo(${k})">↩️ تراجعي خطوة</button><button class="btn alt" onclick="P=newP();drawPuzzle(${k})">↺ من البداية</button></div>`:
    `<div class="row"><button class="btn" style="flex:1" onclick="cross(${k})">⛵ اعبري ${P.cargo?'مع '+NM[P.cargo][1]:'وحدك'}</button>
      <button class="btn alt" onclick="undo(${k})" ${P.hist.length?'':'disabled'}>↩️ تراجع</button></div>${warn}`}
+   </div><div>${b.rules?`<div class="rules">${b.rules}</div>`:''}
    <div class="row"><button class="btn alt" style="font-size:14px;padding:7px 14px" onclick="P.hint=Math.min(P.hint+1,${HINTS.length});drawPuzzle(${k})" ${P.hint>=HINTS.length?'disabled':''}>💡 تلميح ${P.hint?`(${P.hint}/${HINTS.length})`:''}</button></div>
    ${P.hint?HINTS.slice(0,P.hint).map((h,n)=>`<div class="hintbox">💡 ${n+1}. ${h}</div>`).join(''):''}
-   <div class="log"><b>خطواتك:</b> ${P.steps.length?`<ol>${P.steps.map(x=>`<li>${x}</li>`).join('')}</ol>`:'لم تبدئي بعد — المزارع في القارب على الضفة الأولى'}</div>`;
+   <div class="log"><b>خطواتك:</b> ${P.steps.length?`<ol>${P.steps.map(x=>`<li>${x}</li>`).join('')}</ol>`:'لم تبدئي بعد — المزارع في القارب على الضفة الأولى'}</div></div></div>`;
 }
 function load(i,k){if(P.lost)return;sfx.tick();P.cargo=(P.cargo===i?null:i);drawPuzzle(k)}
 function undo(k){
@@ -598,25 +753,11 @@ function cross(k){
   if(P.lost)sfx.bad();else sfx.boat();
   drawPuzzle(k);
   if(!P.lost&&P.x&&P.c&&P.g&&P.f){ts(k).steps=P.steps.slice();confetti(20);
-    $('t'+k).insertAdjacentHTML('beforeend','<div class="fb ok">🎉 أحسنتِ! وصل الجميع بأمان. انظري إلى خطواتك: إنها مرتبة ومحددة وأوصلتك إلى الحل…</div>');
+    $('t'+k).insertAdjacentHTML('afterbegin','<div class="fb ok" style="margin:0 0 6px">🎉 أحسنتِ! وصل الجميع بأمان. انظري إلى خطواتك: إنها مرتبة ومحددة وأوصلتك إلى الحل…</div>');
     setTimeout(()=>award(k),1800);}
 }
 
 /* ===== finish ===== */
-function checkDone(fresh){
-  const st=STATIONS[cur];
-  const ok=st.flow.every((b,k)=>b.type==='learn'||ts(k).ok);if(!ok)return;
-  const first=!S.done.includes(cur);
-  if(first){S.done.push(cur);save();updPts();confetti(30);setTimeout(sfx.win,300)}
-  const last=cur===3;
-  $('endbox').innerHTML=`<div class="endbox">${last?
-   `<div style="font-size:40px">🏆</div><h2 style="font-size:24px">أحسنتِ يا ${esc(S.name)}! أنهيتِ الرحلة كاملة</h2>
-    <button class="btn" onclick="show('s-end');fillCert()">استلمي شهادتك</button>`:
-   `<div style="font-size:40px">🙋‍♀️</div><h2 style="font-size:23px">أحسنتِ! أنهيتِ محطة ${st.title}</h2>
-    <p>أخبري معلمتك أنكِ أنهيتِ المحطة <b>${cur+1}</b> لتعطيكِ <b>رقم السر</b> لفتح المحطة <b>${cur+2}</b>.</p>
-    <button class="btn" onclick="goMap()">🗺️ إلى الخريطة</button>`}</div>`;
-  if(first)setTimeout(()=>$('endbox').scrollIntoView({behavior:'smooth',block:'center'}),700);
-}
 function fillCert(){
   $('cname').textContent=S.name;$('cpts').textContent=Math.round(S.pts);
   const st=S.pts>=90?3:S.pts>=70?2:1;$('cstars').textContent='⭐'.repeat(st)+'☆'.repeat(3-st);
