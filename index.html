@@ -626,6 +626,8 @@ function renderTask(k){
     if(b.type==='open')extra=`<div class="myans">${esc(s.ans||'')}</div>`;
     if(b.type==='puzzle')extra=`<div class="log"><b>خطواتك للحل:</b><ol>${(s.steps||[]).map(x=>`<li>${x}</li>`).join('')}</ol></div>`;
     if(b.type==='order')extra=`<div class="log"><ol>${b.items.map(x=>`<li>${x}</li>`).join('')}</ol></div>`;
+    if(b.type==='match')extra=`<div class="matchgrid" style="margin-top:6px">${b.pairs.map(p=>`<div class="match">${SYM[p[0]]}<div class="opt right" style="margin:0;cursor:default">✔ ${p[1]}</div></div>`).join('')}</div>`;
+    if(b.type==='mcq')extra=`<div class="opts" style="margin-top:6px">${b.opts.map((o,j)=>`<div class="opt ${j===b.a?'right':''}" style="cursor:default;${j===b.a?'':'opacity:.45'}">${j===b.a?'✔ ':''}${o}</div>`).join('')}</div>`;
     const note=`<div class="done-note">✅ أُنجزت (+${Math.round(s.got*10)/10} نقطة) — اضغطي «التالي» للمتابعة</div>`;
     if(b.type==='work'&&b.after){el.innerHTML=`<div class="cols2"><div>${head(k,b)}${note}</div><div>${b.after}</div></div>`;return}
     if(b.type==='puzzle'||b.type==='order'){el.innerHTML=`<div class="cols2"><div>${head(k,b)}${note}</div><div>${extra}</div></div>`;return}
@@ -635,7 +637,7 @@ function renderTask(k){
   if(b.type==='mcq'){
     el.innerHTML=head(k,b)+`<div class="opts">`+b.opts.map((o,j)=>`<button class="opt" onclick="ansMcq(${k},${j},this)">${o}</button>`).join('')+`</div><div class="fb" id="fb${k}"></div>`;
   }else if(b.type==='order'){
-    el.dataset.seq='[]';el.dataset.sh=JSON.stringify(b.items.map((x,j)=>j).sort(()=>Math.random()-.5));
+    el.dataset.seq='[]';el.dataset.sh=JSON.stringify(shuffleIdx(b.items.length));
     drawOrder(k);
   }else if(b.type==='match'){
     const opts=[...new Set(b.pairs.map(p=>p[1]))];
@@ -659,6 +661,13 @@ function ansMcq(k,j,btn){
   const b=STATIONS[cur].flow[k];
   if(j===b.a){sfx.ok();btn.classList.add('right');$('fb'+k).className='fb ok';$('fb'+k).textContent='إجابة صحيحة! 🌟';award(k)}
   else{sfx.bad();btn.classList.add('wrong');miss(k);$('fb'+k).className='fb no';$('fb'+k).textContent='ليست الإجابة الصحيحة، فكّري مرة أخرى 🤔';}
+}
+/* shuffle so that at least half the steps are out of place (never already ordered) */
+function shuffleIdx(n){
+  let a;
+  do{a=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}}
+  while(a.filter((v,i)=>v===i).length>Math.floor(n/2)-1||a.every((v,i)=>v===n-1-i));
+  return a;
 }
 function drawOrder(k){
   const b=STATIONS[cur].flow[k],el=$('t'+k);
