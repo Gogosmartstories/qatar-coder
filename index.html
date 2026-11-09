@@ -548,7 +548,7 @@ const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&qu
 function start(){
   const n=$('nm').value.trim();
   if(!n){$('nmfb').textContent='اكتبي اسمك أولًا 🙂';return}
-  S.name=n;save();if(LIVEMODE){lastI=-1;applyLive()}else goMap();
+  S.name=n;if(LIVEMODE){S={name:n,unlocked:0,done:[],pts:0,ts:{},ses:curSes()};save();lastI=-1;applyLive()}else{save();goMap()}
 }
 function goMap(){show('s-map');drawMap()}
 function updPts(){const p=Math.round(S.pts);$('pts').textContent=p;$('pts2').textContent=p;$('bar').style.width=(S.done.length*25)+'%'}
@@ -870,8 +870,11 @@ async function pollState(){
   try{const r=await fetch(u+'?action=state&_='+Date.now());const j=await r.json();if(j&&j.ok)onState(j.state)}catch(e){}
   setTimeout(pollState,LIVEMODE?3000:15000);
 }
+const curSes=()=>(LIVE&&LIVE.fb&&LIVE.fb._s)||'';
 function onState(st){
   const was=LIVEMODE;LIVE=st;LIVEMODE=st.mode==='live';
+  /* new lesson session -> start fresh (keeps the name) */
+  if(LIVEMODE&&!TEACHER&&S.name&&S.ses!==curSes()){S={name:S.name,unlocked:0,done:[],pts:0,ts:{},ses:curSes()};save();lastI=-1}
   document.body.classList.toggle('live',LIVEMODE);
   if(!S.name&&!TEACHER)return;
   if(LIVEMODE){applyFb();if(st.i!==lastI||!was){lastI=st.i;applyLive()}}
@@ -884,7 +887,7 @@ function completeTask(st,k,withPts){
   save();
   if(cur===st&&PG[pi]&&PG[pi].k===k&&$('s-station').classList.contains('on')){if(withPts)sfx.unlock();renderTask(k);updPts()}
 }
-function applyFb(){if(!LIVE||!LIVE.fb)return;Object.keys(LIVE.fb).forEach(id=>{if(!LIVE.fb[id])return;const [st,k]=id.split('-').map(Number);const t=S.ts[id];completeTask(st,k,!!(t&&t.ready))})}
+function applyFb(){if(!LIVE||!LIVE.fb)return;Object.keys(LIVE.fb).forEach(id=>{if(id[0]==='_'||!LIVE.fb[id])return;const [st,k]=id.split('-').map(Number);const t=S.ts[id];completeTask(st,k,!!(t&&t.ready))})}
 function applyLive(){
   const i=Math.min(LIVE.i,SEQ.length-1),it=SEQ[i];
   if(it.v==='lobby'){show('s-lobby');renderLobby()}
@@ -946,7 +949,7 @@ function tFb(){const w=curWork();if(!w)return;LIVE.fb=LIVE.fb||{};LIVE.fb[w]=tru
 function tMode(){const m=LIVE.mode==='live'?'self':'live';LIVE.mode=m;LIVEMODE=m==='live';document.body.classList.toggle('live',LIVEMODE);setLive(LIVE.i,{mode:m})}
 function tReset(btn){
   if(!btn.dataset.sure){btn.dataset.sure=1;btn.textContent='⚠️ متأكدة؟ اضغطي مجددًا';setTimeout(()=>{delete btn.dataset.sure;btn.textContent='⏮ من البداية'},4000);return}
-  delete btn.dataset.sure;btn.textContent='⏮ من البداية';LIVE.fb={};S={name:'المعلمة',unlocked:0,done:[],pts:0,ts:{}};try{localStorage.removeItem(KEY)}catch(e){}setLive(0,{reset:'1'});
+  delete btn.dataset.sure;btn.textContent='⏮ من البداية';LIVE.fb={_s:Date.now().toString(36)};S={name:'المعلمة',unlocked:0,done:[],pts:0,ts:{}};try{localStorage.removeItem(KEY)}catch(e){}setLive(0);
 }
 function seqLabel(it){
   if(!it)return'';if(it.v==='lobby')return'👥 قاعة الانتظار';if(it.v==='map')return`🗺️ الخريطة ← المحطة ${it.st+1}: ${STATIONS[it.st].title}`;
