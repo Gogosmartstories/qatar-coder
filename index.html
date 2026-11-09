@@ -239,7 +239,7 @@ body.live:not(.teacher) .st-top>.btn.alt,body.live:not(.teacher) .reset{display:
 .drow details{margin-top:4px;font-size:13px}
 .drow summary{cursor:pointer;color:#7b5cd6;font-weight:700}
 .drow .ans{background:#f1ecff;border-radius:8px;padding:5px 8px;margin-top:4px;line-height:1.6;white-space:pre-wrap}
-body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .row{display:none}
+body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .row,body.teacher .swbtn{display:none}
 @media (max-width:820px){
   body{overflow:auto}.wrap{height:auto;min-height:100vh}
   .screen.on{flex:none}
@@ -316,6 +316,7 @@ body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .
       <h1 id="lobbyt" style="color:var(--sea)"></h1>
       <p id="lobbyp" style="line-height:1.9"></p>
       <div id="lobbynames" class="names"></div>
+      <button class="btn alt swbtn" style="font-size:14px;padding:8px 14px;margin-top:14px" onclick="switchStudent(this)">👤 لستِ <span class="lname"></span>؟ تبديل الطالبة</button>
     </div>
   </section>
 
@@ -342,6 +343,7 @@ body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .
       <div class="row" style="justify-content:center">
         <button class="btn alt" onclick="goMap()">العودة للخريطة</button>
         <button class="btn alt reset" onclick="resetAll(this)">🔄 ابدئي من جديد</button>
+        <button class="btn alt swbtn" onclick="switchStudent(this)">👤 طالبة أخرى؟</button>
       </div>
     </div>
   </section>
@@ -542,7 +544,7 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}sync()
 let syncT=null;
 function sync(){
   if(!S.name||TEACHER)return;
-  if(!S.sid){S.sid=Date.now().toString(36)+Math.random().toString(36).slice(2,10);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+  if(!S.sid){S.sid=(S.ses||'')+'z'+Date.now().toString(36)+Math.random().toString(36).slice(2,10);try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
   clearTimeout(syncT);
   syncT=setTimeout(()=>{
     const API=window.SHEET_URL||'';if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(API))return;
@@ -863,7 +865,7 @@ function cross(k){
 
 /* ===== finish ===== */
 function fillCert(){
-  if(TEACHER){$('cname').textContent='✨ كل طالبة ترى الآن شهادتها باسمها ✨';const L=RES.length?Math.round(RES.reduce((a,o)=>a+o.p,0)/RES.length):0;$('cpts').textContent=L;$('cptsl').textContent='متوسط نقاط الصف';$('cstars').textContent='⭐⭐⭐';$('cdate').textContent='';confetti(40);setTimeout(sfx.fanfare,250);return}
+  if(TEACHER){$('cname').textContent='✨ كل طالبة ترى الآن شهادتها باسمها ✨';const U=uniqRes(),L=U.length?Math.round(U.reduce((a,o)=>a+o.p,0)/U.length):0;$('cpts').textContent=L;$('cptsl').textContent='متوسط نقاط الصف';$('cstars').textContent='⭐⭐⭐';$('cdate').textContent='';confetti(40);setTimeout(sfx.fanfare,250);return}
   $('cname').textContent=S.name;$('cpts').textContent=Math.round(S.pts);
   const st=S.pts>=90?3:S.pts>=70?2:1;$('cstars').textContent='⭐'.repeat(st)+'☆'.repeat(3-st);
   $('cdate').textContent=new Date().toLocaleDateString('ar-QA-u-nu-latn',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -886,7 +888,7 @@ const curSes=()=>(LIVE&&LIVE.fb&&LIVE.fb._s)||'';
 function onState(st){
   const was=LIVEMODE;LIVE=st;LIVEMODE=st.mode==='live';
   /* new lesson session -> start fresh (keeps the name) */
-  if(LIVEMODE&&!TEACHER&&S.name&&S.ses!==curSes()){S={name:S.name,unlocked:0,done:[],pts:0,ts:{},ses:curSes()};save();lastI=-1}
+  if(LIVEMODE&&!TEACHER&&S.name&&S.ses!==curSes()){freshStudent(curSes());return}
   document.body.classList.toggle('live',LIVEMODE);
   if(!S.name&&!TEACHER)return;
   if(LIVEMODE){applyFb();if(st.i!==lastI||!was){lastI=st.i;applyLive()}}
@@ -910,12 +912,12 @@ function applyLive(){
   if(TEACHER)renderTBar();
 }
 function renderLobby(){
-  if(TEACHER){$('lobbyt').textContent='👥 قاعة الانتظار';$('lobbyp').innerHTML=`انضمت <b>${RES.length}</b> طالبة حتى الآن. عندما تكتمل الطالبات اضغطي <b>«▶️ ابدئي الرحلة»</b>.`;
-    $('lobbynames').innerHTML=RES.map(o=>`<span>${esc(o.n)}</span>`).join('')}
-  else{$('lobbyt').textContent=`أهلًا ${S.name}! 👋`;$('lobbyp').innerHTML='⏳ انتظري قليلًا… ستبدأ المعلمة الرحلة بعد لحظات.<br>أبقي هذه الصفحة مفتوحة.';$('lobbynames').innerHTML=''}
+  if(TEACHER){const U=uniqRes();$('lobbyt').textContent='👥 قاعة الانتظار';$('lobbyp').innerHTML=`انضمت <b>${U.length}</b> طالبة حتى الآن. عندما تكتمل الطالبات اضغطي <b>«▶️ ابدئي الرحلة»</b>.`;
+    $('lobbynames').innerHTML=U.map(o=>`<span>${esc(o.n)}</span>`).join('')}
+  else{document.querySelectorAll('.lname').forEach(e=>e.textContent=S.name);$('lobbyt').textContent=`أهلًا ${S.name}! 👋`;$('lobbyp').innerHTML='⏳ انتظري قليلًا… ستبدأ المعلمة الرحلة بعد لحظات.<br>أبقي هذه الصفحة مفتوحة.';$('lobbynames').innerHTML=''}
 }
 function renderHonor(){
-  const L=(LIVE&&LIVE.top)||[],med=['🥇','🥈','🥉'];
+  const L=honorTop(),med=['🥇','🥈','🥉'];
   $('stage').innerHTML=L.length?L.map((o,i)=>`<div class="place g${i+1}"><div class="medal">${med[i]}</div><div class="who">${esc(o.n)}</div><div class="p">${o.p} نقطة</div><div class="block">${i+1}</div></div>`).join(''):'<p style="font-size:22px">لا توجد نتائج بعد</p>';
   confetti(70);celebrate();
 }
@@ -948,12 +950,15 @@ async function tLogin(){
 }
 async function tPoll(){try{const j=await tApi({});RES=j.results||[];renderTBar();renderDraw();if(SEQ[LIVE.i]&&SEQ[LIVE.i].v==='lobby')renderLobby()}catch(e){}}
 async function setLive(i,extra){
-  LIVE.i=Math.max(0,Math.min(SEQ.length-1,i));applyFb();lastI=LIVE.i;applyLive();
+  i=Math.max(0,Math.min(SEQ.length-1,i));
+  if(SEQ[i].v==='honor'){try{RES=(await tApi({})).results||RES}catch(e){}LIVE.fb=LIVE.fb||{};LIVE.fb._top=uniqRes().slice(0,3).map(o=>({n:o.n,p:o.p}))}
+  LIVE.i=i;applyFb();lastI=LIVE.i;applyLive();
   try{const j=await tApi(Object.assign({action:'set',i:LIVE.i,fb:JSON.stringify(LIVE.fb||{})},extra||{}));LIVE.top=j.state.top;LIVE.mode=j.state.mode;
     if(SEQ[LIVE.i].v==='honor')renderHonorQuiet();renderTBar()}
   catch(e){$('tcount').textContent='⚠️ تعذّر إرسال الأمر للطالبات، حاولي مرة أخرى'}
 }
-function renderHonorQuiet(){const L=LIVE.top||[],med=['🥇','🥈','🥉'];$('stage').innerHTML=L.length?L.map((o,i)=>`<div class="place g${i+1}"><div class="medal">${med[i]}</div><div class="who">${esc(o.n)}</div><div class="p">${o.p} نقطة</div><div class="block">${i+1}</div></div>`).join(''):'<p style="font-size:22px">لا توجد نتائج بعد</p>';return $('stage').innerHTML}
+const honorTop=()=>(LIVE&&LIVE.fb&&LIVE.fb._top)||(LIVE&&LIVE.top)||[];
+function renderHonorQuiet(){const L=honorTop(),med=['🥇','🥈','🥉'];$('stage').innerHTML=L.length?L.map((o,i)=>`<div class="place g${i+1}"><div class="medal">${med[i]}</div><div class="who">${esc(o.n)}</div><div class="p">${o.p} نقطة</div><div class="block">${i+1}</div></div>`).join(''):'<p style="font-size:22px">لا توجد نتائج بعد</p>';return $('stage').innerHTML}
 function curWork(){const it=SEQ[LIVE.i];if(!it||it.v!=='page')return null;const x=pagesOf(it.st)[it.p];return x.kind==='task'&&STATIONS[it.st].flow[x.k].type==='work'?it.st+'-'+x.k:null}
 function tNext(){const w=curWork();LIVE.fb=LIVE.fb||{};if(w)LIVE.fb[w]=true;if(LIVE.i<SEQ.length-1)setLive(LIVE.i+1)}
 function tPrev(){if(LIVE.i>0)setLive(LIVE.i-1)}
@@ -964,7 +969,7 @@ function tReset(btn){
   delete btn.dataset.sure;btn.textContent='⏮ من البداية';LIVE.fb={_s:Date.now().toString(36)};S={name:'المعلمة',unlocked:0,done:[],pts:0,ts:{}};try{localStorage.removeItem(KEY)}catch(e){}setLive(0);
 }
 function toggleDraw(){const d=$('tdraw');d.classList.toggle('open');sfx.tick();if(d.classList.contains('open'))renderDraw()}
-function uniqRes(){const M={};RES.forEach(o=>{const k=o.n.trim();if(!M[k]||o.t>=M[k].t)M[k]=o});return Object.values(M).sort((a,b)=>b.p-a.p||b.d-a.d||a.t-b.t)}
+function uniqRes(){const M={},ss=curSes();RES.filter(o=>!ss||String(o.sid).indexOf(ss+'z')===0).forEach(o=>{const k=o.n.trim();if(!M[k]||o.t>=M[k].t)M[k]=o});return Object.values(M).sort((a,b)=>b.p-a.p||b.d-a.d||a.t-b.t)}
 const DOPEN=new Set();
 function dTgl(el){const n=el.dataset.n;el.open?DOPEN.add(n):DOPEN.delete(n)}
 function renderDraw(){
@@ -985,9 +990,9 @@ function seqLabel(it){
 function renderTBar(){
   if(!TEACHER||!LIVE)return;const i=LIVE.i,it=SEQ[i],nx=SEQ[i+1];
   $('tlabel').textContent=`${i+1}/${SEQ.length} • `+seqLabel(it);
-  let c=`👥 ${RES.length} طالبة`;
+  const U=uniqRes();let c=`👥 ${U.length} طالبة`;
   if(it.v==='page'){const x=pagesOf(it.st)[it.p];if(x.kind==='task'){const id=it.st+'-'+x.k,isW=STATIONS[it.st].flow[x.k].type==='work';
-    const n=RES.filter(o=>(','+o.k+',').includes(','+id+(isW?'w':'')+',')).length;c+=` • ${isW?'أنهت الحل':'أنجزت المهمة'}: ${n} من ${RES.length}`}}
+    const n=U.filter(o=>(','+o.k+',').includes(','+id+(isW?'w':'')+',')).length;c+=` • ${isW?'أنهت الحل':'أنجزت المهمة'}: ${n} من ${U.length}`}}
   $('tcount').textContent=c+(LIVE.mode==='self'?' • ⚠️ الوضع الذاتي مفعّل (الطالبات لا يتبعن شاشتك)':'');
   $('tnext').textContent=!nx?'✔ انتهت الحصة':i===0?'▶️ ابدئي الرحلة':nx.v==='cert'?'🎓 اعرضي الشهادات':nx.v==='honor'?'🏆 شاشة التكريم':'التالي ⬅️';
   $('tnext').disabled=!nx;
@@ -1016,6 +1021,17 @@ function resultCode(){
   const j=JSON.stringify(o);
   const b=btoa(unescape(encodeURIComponent(j))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   return `${S.name} | ${o.p} نقطة | ${o.d}/4 محطات | #QC:${b}.${fnv(SALT+j)}`;
+}
+/* clear this device for a new student (results already saved stay in the teacher's sheet) */
+function freshStudent(ses){
+  try{localStorage.removeItem(KEY)}catch(e){}
+  S={name:'',unlocked:0,done:[],pts:0,ts:{},ses:ses==null?curSes():ses};lastI=-1;
+  $('nm').value='';$('nmfb').textContent='';show('s-welcome');setTimeout(()=>$('nm').focus(),100);
+}
+function switchStudent(btn){
+  if(!btn.dataset.sure){btn.dataset.sure=1;const t=btn.innerHTML;btn.textContent='⚠️ اضغطي مرة أخرى لتسجيل طالبة جديدة';
+    setTimeout(()=>{if(btn.dataset.sure){delete btn.dataset.sure;btn.innerHTML=t}},4000);return}
+  delete btn.dataset.sure;freshStudent();
 }
 function resetAll(btn){
   if(!btn.dataset.sure){btn.dataset.sure='1';const t=btn.textContent;btn.textContent='⚠️ سيُحذف تقدّمك ونقاطك… اضغطي مرة أخرى للتأكيد';
