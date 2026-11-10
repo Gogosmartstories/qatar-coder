@@ -241,6 +241,7 @@ body.teacher #ver{bottom:72px}
 .drow details{margin-top:4px;font-size:13px}
 .drow summary{cursor:pointer;color:#7b5cd6;font-weight:700}
 .drow .ans{background:#f1ecff;border-radius:8px;padding:5px 8px;margin-top:4px;line-height:1.6;white-space:pre-wrap}
+body.live .offbtn{display:none}
 body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .row,body.teacher .swbtn{display:none}
 @media (max-width:820px){
   body{overflow:auto}.wrap{height:auto;min-height:100vh}
@@ -256,7 +257,7 @@ body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .
 </head>
 <body>
 <div class="bg" id="bg"></div>
-<div id="ver">الإصدار 10-11هـ • <span id="conn">⏳ جارٍ الاتصال…</span></div>
+<div id="ver">الإصدار 10-11و • <span id="conn">⏳ جارٍ الاتصال…</span></div>
 <button id="mute" onclick="toggleMute()" title="الصوت" style="position:fixed;bottom:14px;left:14px;z-index:8;width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font-size:22px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25)">🔊</button>
 <div class="wrap">
 
@@ -294,6 +295,7 @@ body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .
     <div class="map" id="map"></div>
     <div class="mapbottom">
       <div class="hint-bar" id="maphint"></div>
+      <button class="btn sun offbtn" onclick="openSend()">📤 أرسلي نتيجتي لمعلمتي</button>
       <button class="btn alt reset" style="font-size:14px;padding:9px 14px" onclick="resetAll(this)">🔄 ابدئي الرحلة من جديد</button>
     </div>
   </section>
@@ -346,6 +348,7 @@ body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .
       <div class="row" style="justify-content:center">
         <button class="btn alt" onclick="goMap()">العودة للخريطة</button>
         <button class="btn alt reset" onclick="resetAll(this)">🔄 ابدئي من جديد</button>
+        <button class="btn sun offbtn" onclick="openSend()">📤 أرسلي نتيجتي لمعلمتي</button>
         <button class="btn alt swbtn" onclick="switchStudent(this)">👤 طالبة أخرى؟</button>
       </div>
     </div>
@@ -379,6 +382,19 @@ body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .
     <input id="tkey" class="txt" type="password" placeholder="----" autocomplete="off" onkeydown="if(event.key==='Enter')tLogin()">
     <div class="fb no" id="tkfb"></div>
     <button class="btn wide" onclick="tLogin()">دخول</button>
+  </div>
+</div>
+<div class="modal" id="send">
+  <div class="card">
+    <div style="font-size:42px">📤</div>
+    <h2 style="color:var(--sea);font-size:24px">أرسلي نتيجتك لمعلمتك</h2>
+    <p style="line-height:1.8">1. اضغطي <b>نسخ</b><br>2. الصقيها في <b>محادثة الحصة</b> وأرسليها</p>
+    <textarea id="sendtxt" readonly style="min-height:90px;font-size:12px;direction:ltr;text-align:left" onclick="this.select()"></textarea>
+    <div class="fb" id="sendfb"></div>
+    <div class="row" style="justify-content:center">
+      <button class="btn" onclick="copySend()">📋 نسخ</button>
+      <button class="btn alt" onclick="$('send').classList.remove('on')">إغلاق</button>
+    </div>
   </div>
 </div>
 <div class="modal" id="lock">
@@ -1067,6 +1083,13 @@ function switchStudent(btn){
   if(!btn.dataset.sure){btn.dataset.sure=1;const t=btn.innerHTML;btn.textContent='⚠️ اضغطي مرة أخرى لتسجيل طالبة جديدة';
     setTimeout(()=>{if(btn.dataset.sure){delete btn.dataset.sure;btn.innerHTML=t}},4000);return}
   delete btn.dataset.sure;freshStudent();
+}
+function openSend(){$('sendtxt').value=resultCode();$('sendfb').textContent='';$('send').classList.add('on')}
+function copySend(){
+  const t=$('sendtxt');
+  const done=()=>{$('sendfb').className='fb ok';$('sendfb').textContent='✅ تم النسخ! الصقيها الآن في محادثة الحصة';sfx.ok()};
+  try{navigator.clipboard.writeText(t.value).then(done,()=>{t.select();try{document.execCommand('copy');done()}catch(e){$('sendfb').textContent='حدّدي النص وانسخيه يدويًا'}})}
+  catch(e){t.select();try{document.execCommand('copy');done()}catch(e2){}}
 }
 function resetAll(btn){
   if(!btn.dataset.sure){btn.dataset.sure='1';const t=btn.textContent;btn.textContent='⚠️ سيُحذف تقدّمك ونقاطك… اضغطي مرة أخرى للتأكيد';

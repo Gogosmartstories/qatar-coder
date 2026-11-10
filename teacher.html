@@ -73,6 +73,12 @@ tr.top1 td{background:#fff3c4} tr.top2 td{background:#eef1f4} tr.top3 td{backgro
 
   <div class="grid">
     <div class="card">
+      <h3 style="color:var(--sea);font-size:22px">📥 نتائج من محادثة الحصة</h3>
+      <p style="margin:6px 0;color:var(--muted);line-height:1.7">إذا لم تتصل أجهزة الطالبات، تضغط كل طالبة «📤 أرسلي نتيجتي لمعلمتي» وترسل الرسالة في محادثة Teams. انسخي الرسائل (أو المحادثة كاملة) والصقيها هنا.</p>
+      <textarea id="paste" placeholder="الصقي رسائل الطالبات هنا… مثال: نورة | 75 نقطة | 3/4 محطات | #QC:..."></textarea>
+      <div class="row"><button class="btn" onclick="addFromPaste()">➕ إضافة النتائج</button><span class="msg" id="msg"></span></div>
+    </div>
+    <div class="card">
       <h3 style="color:var(--sea);font-size:22px">🔐 دخول المعلمة</h3>
       <div id="login">
         <p style="margin:6px 0;color:var(--muted);line-height:1.7">أدخلي رقم المعلمة السري (TEACHER_KEY في Apps Script) لتظهر نتائج الطالبات مباشرة وأرقام السر.</p>
