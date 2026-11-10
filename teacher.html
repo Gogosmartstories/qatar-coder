@@ -62,6 +62,7 @@ tr.top1 td{background:#fff3c4} tr.top2 td{background:#eef1f4} tr.top3 td{backgro
 @keyframes rise{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:none}}
 .confetti{position:fixed;top:-10px;font-size:24px;animation:fall 3s linear forwards;z-index:20;pointer-events:none}
 @keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+body:not(.fb) .fbonly{display:none}
 </style>
 </head>
 <body>
@@ -69,32 +70,6 @@ tr.top1 td{background:#fff3c4} tr.top2 td{background:#eef1f4} tr.top3 td{backgro
   <div class="top">
     <div><h1>👩‍🏫 لوحة المعلمة</h1><div style="opacity:.8">رحلة المبرمجة في قطر • خطوات حل المشكلات • الصف التاسع</div></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn" style="font-size:18px;text-decoration:none;background:#8a1538;box-shadow:0 4px 0 #5a1230" href="index.html#teacher" target="_blank" rel="noopener" title="تفتح في تبويب جديد">🎮 قيادة الحصة</a><button class="btn sun" style="font-size:18px" onclick="podium()">🏆 شاشة التكريم</button></div>
-  </div>
-
-  <div class="grid">
-    <div class="card">
-      <h3 style="color:var(--sea);font-size:22px">📥 نتائج من محادثة الحصة</h3>
-      <p style="margin:6px 0;color:var(--muted);line-height:1.7">إذا لم تتصل أجهزة الطالبات، تضغط كل طالبة «📤 أرسلي نتيجتي لمعلمتي» وترسل الرسالة في محادثة Teams. انسخي الرسائل (أو المحادثة كاملة) والصقيها هنا.</p>
-      <textarea id="paste" placeholder="الصقي رسائل الطالبات هنا… مثال: نورة | 75 نقطة | 3/4 محطات | #QC:..."></textarea>
-      <div class="row"><button class="btn" onclick="addFromPaste()">➕ إضافة النتائج</button><span class="msg" id="msg"></span></div>
-    </div>
-    <div class="card">
-      <h3 style="color:var(--sea);font-size:22px">🔐 دخول المعلمة</h3>
-      <div id="login">
-        <p style="margin:6px 0;color:var(--muted);line-height:1.7">أدخلي رقم المعلمة السري (TEACHER_KEY في Apps Script) لتظهر نتائج الطالبات مباشرة وأرقام السر.</p>
-        <input id="tk" type="password" style="font:inherit;font-size:18px;width:100%;padding:10px;border-radius:12px;border:2px solid var(--sand2);text-align:center" placeholder="الرقم السري للمعلمة" onkeydown="if(event.key==='Enter')login()">
-        <div class="row"><button class="btn" onclick="login()">دخول</button><span class="msg" id="lmsg"></span></div>
-      </div>
-      <div id="logged" style="display:none">
-        <div class="row" style="margin:4px 0 8px;justify-content:space-between"><span id="livestat" style="font-weight:800;color:var(--ok)">🟢 مباشر</span><button class="btn alt" style="padding:6px 12px;font-size:13px" onclick="logout()">خروج</button></div>
-        <h3 style="color:var(--sea);font-size:20px">🔑 أرقام السر</h3>
-        <table class="codes" id="codes"></table>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="stats" id="stats"></div>
   </div>
 
   <div class="card" style="overflow-x:auto">
@@ -107,6 +82,34 @@ tr.top1 td{background:#fff3c4} tr.top2 td{background:#eef1f4} tr.top3 td{backgro
     </div>
     <div id="table"></div>
   </div>
+
+
+  <div class="card">
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3 style="color:var(--sea);font-size:22px">📥 نتائج من محادثة الحصة</h3>
+      <p style="margin:6px 0;color:var(--muted);line-height:1.7">إذا لم تتصل أجهزة الطالبات، تضغط كل طالبة «📤 أرسلي نتيجتي لمعلمتي» وترسل الرسالة في محادثة Teams. انسخي الرسائل (أو المحادثة كاملة) والصقيها هنا.</p>
+      <textarea id="paste" placeholder="الصقي رسائل الطالبات هنا… مثال: نورة | 75 نقطة | 3/4 محطات | #QC:..."></textarea>
+      <div class="row"><button class="btn" onclick="addFromPaste()">➕ إضافة النتائج</button><span class="msg" id="msg"></span></div>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--sea);font-size:22px">🔐 دخول المعلمة</h3>
+      <div id="login">
+        <p style="margin:6px 0;color:var(--muted);line-height:1.7">أدخلي بريدك وكلمة المرور لتظهر نتائج الطالبات مباشرة.</p>
+        <input id="tem" type="email" dir="ltr" class="fbonly" style="font:inherit;font-size:16px;width:100%;padding:10px;border-radius:12px;border:2px solid var(--sand2);text-align:center;margin-bottom:8px" placeholder="البريد الإلكتروني للمعلمة" autocomplete="username">
+        <input id="tk" type="password" style="font:inherit;font-size:18px;width:100%;padding:10px;border-radius:12px;border:2px solid var(--sand2);text-align:center" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')login()">
+        <div class="row"><button class="btn" onclick="login()">دخول</button><span class="msg" id="lmsg"></span></div>
+      </div>
+      <div id="logged" style="display:none">
+        <div class="row" style="margin:4px 0 8px;justify-content:space-between"><span id="livestat" style="font-weight:800;color:var(--ok)">🟢 مباشر</span><button class="btn alt" style="padding:6px 12px;font-size:13px" onclick="logout()">خروج</button></div>
+      </div>
+    </div>
+  </div>
+
+
 </div>
 
 <div class="pod" id="pod" onclick="this.classList.remove('on')">
@@ -127,7 +130,56 @@ let R={};try{R=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
 let SRV=[],TK='',POLL=null;try{TK=localStorage.getItem('qc-tk')||''}catch(e){}
 /* talk to Google Apps Script: first through our own site (/api/gs, works on school networks), then directly */
 let GSVIA=null,GSERR=[];
+/* ===== Firebase Realtime Database (allowed on the school network) ===== */
+const FBC=()=>(window.FIREBASE&&/^https:\/\//.test(window.FIREBASE.url||'')&&/^AIza/.test(window.FIREBASE.apiKey||''))?window.FIREBASE:null;
+const TCODES=[['فتح المحطة 1: شاطئ فويرط','1590'],['التغذية الراجعة: غابة القرم','1122'],['فتح المحطة 2: غابة القرم','2468'],['التغذية الراجعة: واحة العلوم','3344'],['فتح المحطة 3: واحة قطر للعلوم','1357'],['فتح المحطة 4: مزرعة الشمال','9024']];
+let FBTOK=null,FBEXP=0,FBPASS='';
+function temail(){let v='';try{const e=document.getElementById('temail')||document.getElementById('tem');v=(e&&e.value.trim())||localStorage.getItem('qc-tem')||''}catch(x){}return v}
+async function fbSignIn(pass){
+  if(FBTOK&&Date.now()<FBEXP&&pass===FBPASS)return FBTOK;
+  const c=FBC(),em=temail();if(!em||!pass)throw new Error('WRONG_KEY');
+  const r=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key='+encodeURIComponent(c.apiKey),
+    {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,password:pass,returnSecureToken:true})});
+  const j=await r.json().catch(()=>({}));
+  if(!j.idToken)throw new Error('WRONG_KEY');
+  try{localStorage.setItem('qc-tem',em)}catch(x){}
+  FBTOK=j.idToken;FBPASS=pass;FBEXP=Date.now()+(Number(j.expiresIn||3600)-120)*1000;return FBTOK;
+}
+async function fbReq(path,method,body,tok){
+  const c=FBC(),url=c.url.replace(/\/+$/,'')+'/'+path+'.json'+(tok?'?auth='+encodeURIComponent(tok):'');
+  const r=await fetch(url,{method:method||'GET',cache:'no-store',body:body===undefined?undefined:JSON.stringify(body)});
+  const j=await r.json().catch(()=>null);
+  if(!r.ok)throw new Error(r.status===401||r.status===403?'WRONG_KEY':'HTTP '+r.status);
+  return j;
+}
+async function fbApi(params,opts){
+  const p=new URLSearchParams(params||'');opts=opts||{};
+  const norm=st=>{st=st||{};st.mode=st.mode||'live';st.i=Number(st.i)||0;st.fb=st.fb||{};st.top=st.top||[];return st};
+  if(opts.method==='POST'){
+    let b={};try{b=JSON.parse(opts.body||'{}')}catch(x){}
+    const sid=String(b.sid||'').replace(/[^a-zA-Z0-9]/g,'').slice(0,40);if(!sid||!b.n)return{ok:false,error:'missing'};
+    await fbReq('results/'+sid,'PUT',{sid,n:String(b.n).slice(0,40),p:Math.round(Math.max(0,Math.min(100,Number(b.p)||0))),d:Math.max(0,Math.min(4,Number(b.d)||0)),
+      a1:String(b.a1||'').slice(0,800),a2:String(b.a2||'').slice(0,800),k:String(b.k||'').replace(/[^0-9,\-w]/g,'').slice(0,300),t:{'.sv':'timestamp'}});
+    return{ok:true};
+  }
+  if(p.get('action')==='state')return{ok:true,state:norm(await fbReq('state'))};
+  const tok=await fbSignIn(p.get('key')||'');
+  const resList=async()=>Object.values((await fbReq('results','GET',undefined,tok))||{}).filter(o=>o&&o.sid);
+  if(p.get('action')==='set'){
+    const st=norm(await fbReq('state'));
+    if(p.get('mode')==='live'||p.get('mode')==='self')st.mode=p.get('mode');
+    if(p.get('i')!=null)st.i=Math.max(0,Math.min(200,Number(p.get('i'))||0));
+    if(p.get('fb')){try{st.fb=JSON.parse(p.get('fb'))}catch(x){}}
+    if(p.get('reset')==='1'){st.i=0;st.fb={}}
+    const best={};(await resList()).forEach(o=>{const k=String(o.n).trim();if(!best[k]||o.t>best[k].t)best[k]=o});
+    st.top=Object.values(best).sort((a,b)=>b.p-a.p||b.d-a.d||a.t-b.t).slice(0,3).map(o=>({n:o.n,p:o.p}));st.t=Date.now();
+    await fbReq('state','PUT',st,tok);return{ok:true,state:norm(st)};
+  }
+  if(p.get('action')==='clear'){await fbReq('results','DELETE',undefined,tok);return{ok:true}}
+  return{ok:true,results:await resList(),codes:TCODES,state:norm(await fbReq('state'))};
+}
 async function gsFetch(params,opts){
+  if(FBC()){try{const j=await fbApi(params,opts);GSVIA='firebase';return j}catch(e){GSERR.push('firebase: '+(e&&e.message||e));throw e}}
   const u=window.SHEET_URL||'',m=u.match(/\/s\/([A-Za-z0-9_-]+)\/exec/),id=m?m[1]:'';
   opts=opts||{};
   const asJson=async r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()};
@@ -156,7 +208,7 @@ async function gsFetch(params,opts){
 }
 async function fetchResults(method){
   const API=window.SHEET_URL||'';
-  if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(API))throw new Error('NO_URL');
+  if(!FBC()&&!/^https:\/\/script\.google(usercontent)?\.com\//.test(API))throw new Error('NO_URL');
   let j={};try{j=await gsFetch('key='+encodeURIComponent(TK)+(method==='DELETE'?'&action=clear':'')+'&_='+Date.now())}catch(e){throw new Error('NET')}
   if(!j.ok)throw new Error(j.error||'NET');
   return j;
@@ -168,11 +220,11 @@ async function login(){
     const j=await fetchResults();
     try{localStorage.setItem('qc-tk',TK)}catch(e){}
     $('login').style.display='none';$('logged').style.display='block';
-    $('codes').innerHTML='<tr><th>الاستخدام</th><th>الرقم</th></tr>'+j.codes.map(c=>`<tr><td>${esc(c[0])}</td><td><b>${esc(c[1])}</b></td></tr>`).join('');
+
     SRV=j.results;render();stamp();
     clearInterval(POLL);POLL=setInterval(poll,6000);
   }catch(e){
-    const m={WRONG_KEY:'الرقم السري غير صحيح',NO_URL:'لم يُلصق رابط Apps Script في ملف config.js بعد'}[e.message]||'تعذّر الاتصال بـ Google Sheets (تأكدي من نشر Apps Script بصلاحية Anyone)';
+    const m={WRONG_KEY:FBC()?'البريد أو كلمة المرور غير صحيحة':'الرقم السري غير صحيح',NO_URL:'لم يُلصق رابط Apps Script في ملف config.js بعد'}[e.message]||'تعذّر الاتصال بـ Google Sheets (تأكدي من نشر Apps Script بصلاحية Anyone)';
     $('lmsg').style.color='var(--bad)';$('lmsg').textContent=m;
     if(e.message==='WRONG_KEY'){TK='';try{localStorage.removeItem('qc-tk')}catch(x){}}
   }
@@ -267,6 +319,7 @@ function podium(){
   $('pod').classList.add('on');celebrate();
   const e=['🎉','⭐','✨','🎊','💛'];for(let i=0;i<60;i++){const d=document.createElement('div');d.className='confetti';d.textContent=e[i%5];d.style.left=Math.random()*100+'vw';d.style.animationDelay=Math.random()*1.5+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),4800)}
 }
+if(FBC())document.body.classList.add('fb');try{$('tem').value=localStorage.getItem('qc-tem')||''}catch(e){}
 render();
 if(TK){$('tk').value='';login()}
 </script>
