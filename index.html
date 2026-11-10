@@ -257,7 +257,7 @@ body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .
 </head>
 <body>
 <div class="bg" id="bg"></div>
-<div id="ver">الإصدار 10-11و • <span id="conn">⏳ جارٍ الاتصال…</span></div>
+<div id="ver">الإصدار 10-11ز • <span id="conn">⏳ جارٍ الاتصال…</span></div>
 <button id="mute" onclick="toggleMute()" title="الصوت" style="position:fixed;bottom:14px;left:14px;z-index:8;width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font-size:22px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25)">🔊</button>
 <div class="wrap">
 
@@ -610,7 +610,7 @@ const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&qu
 function start(){
   const n=$('nm').value.trim();
   if(!n){$('nmfb').textContent='اكتبي اسمك أولًا 🙂';return}
-  S.name=n;if(LIVEMODE){S={name:n,unlocked:0,done:[],pts:0,ts:{},ses:curSes()};save();lastI=-1;applyLive()}else{save();goMap()}
+  S.name=n;if(LIVEMODE){S={name:n,unlocked:0,done:[],pts:0,ts:{},ses:curSes()};save();lastI=-1;if(LIVE)applyLive();else{show('s-lobby');renderLobby()}}else{save();goMap()}
 }
 function goMap(){show('s-map');drawMap()}
 function updPts(){const p=Math.round(S.pts);$('pts').textContent=p;$('pts2').textContent=p;$('bar').style.width=(S.done.length*25)+'%'}
@@ -929,7 +929,7 @@ let LIVE=null,LIVEMODE=false,lastI=-1,RES=[],TK='';
 function liveSt(){if(!LIVE)return null;let st=null;for(let i=0;i<=Math.min(LIVE.i,SEQ.length-1);i++){if(SEQ[i].st!=null)st=SEQ[i].st}const it=SEQ[Math.min(LIVE.i,SEQ.length-1)];if(it.v==='cert'||it.v==='honor')return 4;return st}
 async function pollState(){
   const u=apiURL();if(TEACHER)return;if(!u){$('conn').textContent='🔴 لا يوجد رابط Apps Script';return}
-  try{const j=await gsFetch('action=state&_='+Date.now());if(j&&j.ok){onState(j.state);$('conn').textContent='🟢 متصلة بالمعلمة'+(GSVIA==='site'?' (عبر الموقع)':GSVIA==='site2'?' (عبر الموقع 2)':GSVIA==='site3'?' (عبر الموقع 3)':'')}else $('conn').textContent='🔴 غير متصلة (خطأ في Apps Script)'}catch(e){$('conn').textContent='🔴 غير متصلة بالمعلمة ['+GSERR.slice(-4).join(' | ').slice(0,150)+']';GSERR=[]}
+  try{const j=await gsFetch('action=state&_='+Date.now());if(j&&j.ok){onState(j.state);$('conn').textContent='🟢 متصلة بالمعلمة'+(GSVIA==='site'?' (عبر الموقع)':GSVIA==='site2'?' (عبر الموقع 2)':GSVIA==='site3'?' (عبر الموقع 3)':'')}else $('conn').textContent='🔴 غير متصلة (خطأ في Apps Script)'}catch(e){if(!LIVE&&S.name&&$('s-lobby').classList.contains('on'))$('lobbyp').innerHTML='🔴 تعذّر الاتصال بالمعلمة… أحاول مرة أخرى تلقائيًا.<br>أبقي هذه الصفحة مفتوحة وأخبري معلمتك.';$('conn').textContent='🔴 غير متصلة بالمعلمة ['+GSERR.slice(-4).join(' | ').slice(0,150)+']';GSERR=[]}
   setTimeout(pollState,LIVEMODE?3000:15000);
 }
 const curSes=()=>(LIVE&&LIVE.fb&&LIVE.fb._s)||'';
@@ -963,7 +963,7 @@ function renderLobby(){
   if(TEACHER){const U=uniqRes();$('lobbyt').textContent='👥 قاعة الانتظار';$('lobbyp').innerHTML=`انضمت <b>${U.length}</b> طالبة حتى الآن. عندما تكتمل الطالبات اضغطي <b>«▶️ ابدئي الرحلة»</b>.`;
     if(LIVE&&LIVE.mode==='self')$('lobbyp').innerHTML=`<div class="warn" style="font-size:1.05em">⚠️ <b>قيادة الحصة متوقفة</b> (الوضع الذاتي مفعّل)، لذلك الطالبات لا يدخلن قاعة الانتظار ولا يتبعن شاشتك.</div><button class="btn sun" style="margin-top:10px" onclick="tMode()">👩‍🏫 تفعيل قيادة الحصة الآن</button>`;
     $('lobbynames').innerHTML=U.map(o=>`<span>${esc(o.n)}</span>`).join('')}
-  else{document.querySelectorAll('.lname').forEach(e=>e.textContent=S.name);$('lobbyt').textContent=`أهلًا ${S.name}! 👋`;$('lobbyp').innerHTML='⏳ انتظري قليلًا… ستبدأ المعلمة الرحلة بعد لحظات.<br>أبقي هذه الصفحة مفتوحة.';$('lobbynames').innerHTML=''}
+  else{document.querySelectorAll('.lname').forEach(e=>e.textContent=S.name);$('lobbyt').textContent=`أهلًا ${S.name}! 👋`;$('lobbyp').innerHTML=LIVE?'⏳ انتظري قليلًا… ستبدأ المعلمة الرحلة بعد لحظات.<br>أبقي هذه الصفحة مفتوحة.':'⏳ جارٍ الاتصال بالمعلمة…<br>أبقي هذه الصفحة مفتوحة، وإذا طال الانتظار أخبري معلمتك.';$('lobbynames').innerHTML=''}
 }
 function renderHonor(){
   const L=honorTop(),med=['🥇','🥈','🥉'];
@@ -1103,7 +1103,8 @@ if(TEACHER){
   try{TK=localStorage.getItem('qc-tk')||''}catch(e){}
   $('tlogin').classList.add('on');if(TK){$('tkey').value='';tLogin()}
 }else{
-  if(S.name){goMap();sync()}
+  if(apiURL()){LIVEMODE=true;document.body.classList.add('live')}
+  if(S.name){if(LIVEMODE){show('s-lobby');renderLobby()}else goMap();sync()}
   pollState();
 }
 </script>
