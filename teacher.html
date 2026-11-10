@@ -209,11 +209,12 @@ async function gsFetch(params,opts){
 async function fetchResults(method){
   const API=window.SHEET_URL||'';
   if(!FBC()&&!/^https:\/\/script\.google(usercontent)?\.com\//.test(API))throw new Error('NO_URL');
-  let j={};try{j=await gsFetch('key='+encodeURIComponent(TK)+(method==='DELETE'?'&action=clear':'')+'&_='+Date.now())}catch(e){throw new Error('NET')}
+  let j={};try{j=await gsFetch('key='+encodeURIComponent(TK)+(method==='DELETE'?'&action=clear':'')+'&_='+Date.now())}catch(e){throw new Error(e&&e.message==='WRONG_KEY'?'WRONG_KEY':'NET')}
   if(!j.ok)throw new Error(j.error||'NET');
   return j;
 }
 async function login(){
+  if(FBC()&&!$('tem').value.trim()){$('lmsg').style.color='var(--bad)';$('lmsg').textContent='اكتبي بريدك الإلكتروني أولًا';return}
   TK=$('tk').value.trim()||TK;if(!TK)return;
   $('lmsg').style.color='var(--muted)';$('lmsg').textContent='جارٍ الدخول…';
   try{
@@ -224,7 +225,7 @@ async function login(){
     SRV=j.results;render();stamp();
     clearInterval(POLL);POLL=setInterval(poll,6000);
   }catch(e){
-    const m={WRONG_KEY:FBC()?'البريد أو كلمة المرور غير صحيحة':'الرقم السري غير صحيح',NO_URL:'لم يُلصق رابط Apps Script في ملف config.js بعد'}[e.message]||'تعذّر الاتصال بـ Google Sheets (تأكدي من نشر Apps Script بصلاحية Anyone)';
+    const m={WRONG_KEY:FBC()?'البريد أو كلمة المرور غير صحيحة':'الرقم السري غير صحيح',NO_URL:'لم يُلصق رابط Apps Script في ملف config.js بعد'}[e.message]||(FBC()?'تعذّر الاتصال بـ Firebase. تأكدي من الرابط والمفتاح في config.js':'تعذّر الاتصال بـ Google Sheets (تأكدي من نشر Apps Script بصلاحية Anyone)');
     $('lmsg').style.color='var(--bad)';$('lmsg').textContent=m;
     if(e.message==='WRONG_KEY'){TK='';try{localStorage.removeItem('qc-tk')}catch(x){}}
   }

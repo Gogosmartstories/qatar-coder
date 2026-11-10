@@ -220,6 +220,7 @@ body.teacher .wrap{height:calc(100vh - 68px)}
 #tbar #tnext{font-size:clamp(16px,1.3vw,20px);min-width:170px}
 #tbar .tsep{width:1px;height:36px;background:rgba(255,255,255,.3)}
 body.live:not(.teacher) .st-top>.btn.alt,body.live:not(.teacher) .reset{display:none}
+body:not(.fb) .fbonly{display:none}
 #ver{position:fixed;bottom:4px;right:10px;max-width:70vw;z-index:7;font-size:12px;color:rgba(255,255,255,.75);background:rgba(0,0,0,.25);border-radius:99px;padding:2px 10px;pointer-events:none}
 body.teacher #ver{bottom:72px}
 #tdraw{position:fixed;top:0;left:0;bottom:68px;width:min(460px,92vw);background:var(--card);z-index:9;transform:translateX(-105%);transition:transform .35s ease;box-shadow:8px 0 30px rgba(0,0,0,.35);display:flex;flex-direction:column;padding:14px;gap:10px}
@@ -257,7 +258,7 @@ body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .
 </head>
 <body>
 <div class="bg" id="bg"></div>
-<div id="ver">الإصدار 10-11ز • <span id="conn">⏳ جارٍ الاتصال…</span></div>
+<div id="ver">الإصدار 10-11ح • <span id="conn">⏳ جارٍ الاتصال…</span></div>
 <button id="mute" onclick="toggleMute()" title="الصوت" style="position:fixed;bottom:14px;left:14px;z-index:8;width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font-size:22px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25)">🔊</button>
 <div class="wrap">
 
@@ -379,7 +380,8 @@ body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .
     <div style="font-size:46px">👩‍🏫</div>
     <h2 style="color:var(--sea);font-size:24px">قيادة الحصة</h2>
     <p>أدخلي رقمك السري (TEACHER_KEY) لتتحكمي في شاشات الطالبات.</p>
-    <input id="tkey" class="txt" type="password" placeholder="----" autocomplete="off" onkeydown="if(event.key==='Enter')tLogin()">
+    <input id="temail" class="txt fbonly" type="email" dir="ltr" style="letter-spacing:0;font-size:16px" placeholder="البريد الإلكتروني للمعلمة" autocomplete="username">
+    <input id="tkey" class="txt" type="password" placeholder="كلمة المرور / الرقم السري" autocomplete="off" onkeydown="if(event.key==='Enter')tLogin()">
     <div class="fb no" id="tkfb"></div>
     <button class="btn wide" onclick="tLogin()">دخول</button>
   </div>
@@ -561,7 +563,56 @@ try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.ts)S=s;}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}sync()}
 /* talk to Google Apps Script: first through our own site (/api/gs, works on school networks), then directly */
 let GSVIA=null,GSERR=[];
+/* ===== Firebase Realtime Database (allowed on the school network) ===== */
+const FBC=()=>(window.FIREBASE&&/^https:\/\//.test(window.FIREBASE.url||'')&&/^AIza/.test(window.FIREBASE.apiKey||''))?window.FIREBASE:null;
+const TCODES=[['فتح المحطة 1: شاطئ فويرط','1590'],['التغذية الراجعة: غابة القرم','1122'],['فتح المحطة 2: غابة القرم','2468'],['التغذية الراجعة: واحة العلوم','3344'],['فتح المحطة 3: واحة قطر للعلوم','1357'],['فتح المحطة 4: مزرعة الشمال','9024']];
+let FBTOK=null,FBEXP=0,FBPASS='';
+function temail(){let v='';try{const e=document.getElementById('temail')||document.getElementById('tem');v=(e&&e.value.trim())||localStorage.getItem('qc-tem')||''}catch(x){}return v}
+async function fbSignIn(pass){
+  if(FBTOK&&Date.now()<FBEXP&&pass===FBPASS)return FBTOK;
+  const c=FBC(),em=temail();if(!em||!pass)throw new Error('WRONG_KEY');
+  const r=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key='+encodeURIComponent(c.apiKey),
+    {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,password:pass,returnSecureToken:true})});
+  const j=await r.json().catch(()=>({}));
+  if(!j.idToken)throw new Error('WRONG_KEY');
+  try{localStorage.setItem('qc-tem',em)}catch(x){}
+  FBTOK=j.idToken;FBPASS=pass;FBEXP=Date.now()+(Number(j.expiresIn||3600)-120)*1000;return FBTOK;
+}
+async function fbReq(path,method,body,tok){
+  const c=FBC(),url=c.url.replace(/\/+$/,'')+'/'+path+'.json'+(tok?'?auth='+encodeURIComponent(tok):'');
+  const r=await fetch(url,{method:method||'GET',cache:'no-store',body:body===undefined?undefined:JSON.stringify(body)});
+  const j=await r.json().catch(()=>null);
+  if(!r.ok)throw new Error(r.status===401||r.status===403?'WRONG_KEY':'HTTP '+r.status);
+  return j;
+}
+async function fbApi(params,opts){
+  const p=new URLSearchParams(params||'');opts=opts||{};
+  const norm=st=>{st=st||{};st.mode=st.mode||'live';st.i=Number(st.i)||0;st.fb=st.fb||{};st.top=st.top||[];return st};
+  if(opts.method==='POST'){
+    let b={};try{b=JSON.parse(opts.body||'{}')}catch(x){}
+    const sid=String(b.sid||'').replace(/[^a-zA-Z0-9]/g,'').slice(0,40);if(!sid||!b.n)return{ok:false,error:'missing'};
+    await fbReq('results/'+sid,'PUT',{sid,n:String(b.n).slice(0,40),p:Math.round(Math.max(0,Math.min(100,Number(b.p)||0))),d:Math.max(0,Math.min(4,Number(b.d)||0)),
+      a1:String(b.a1||'').slice(0,800),a2:String(b.a2||'').slice(0,800),k:String(b.k||'').replace(/[^0-9,\-w]/g,'').slice(0,300),t:{'.sv':'timestamp'}});
+    return{ok:true};
+  }
+  if(p.get('action')==='state')return{ok:true,state:norm(await fbReq('state'))};
+  const tok=await fbSignIn(p.get('key')||'');
+  const resList=async()=>Object.values((await fbReq('results','GET',undefined,tok))||{}).filter(o=>o&&o.sid);
+  if(p.get('action')==='set'){
+    const st=norm(await fbReq('state'));
+    if(p.get('mode')==='live'||p.get('mode')==='self')st.mode=p.get('mode');
+    if(p.get('i')!=null)st.i=Math.max(0,Math.min(200,Number(p.get('i'))||0));
+    if(p.get('fb')){try{st.fb=JSON.parse(p.get('fb'))}catch(x){}}
+    if(p.get('reset')==='1'){st.i=0;st.fb={}}
+    const best={};(await resList()).forEach(o=>{const k=String(o.n).trim();if(!best[k]||o.t>best[k].t)best[k]=o});
+    st.top=Object.values(best).sort((a,b)=>b.p-a.p||b.d-a.d||a.t-b.t).slice(0,3).map(o=>({n:o.n,p:o.p}));st.t=Date.now();
+    await fbReq('state','PUT',st,tok);return{ok:true,state:norm(st)};
+  }
+  if(p.get('action')==='clear'){await fbReq('results','DELETE',undefined,tok);return{ok:true}}
+  return{ok:true,results:await resList(),codes:TCODES,state:norm(await fbReq('state'))};
+}
 async function gsFetch(params,opts){
+  if(FBC()){try{const j=await fbApi(params,opts);GSVIA='firebase';return j}catch(e){GSERR.push('firebase: '+(e&&e.message||e));throw e}}
   const u=window.SHEET_URL||'',m=u.match(/\/s\/([A-Za-z0-9_-]+)\/exec/),id=m?m[1]:'';
   opts=opts||{};
   const asJson=async r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()};
@@ -922,14 +973,14 @@ function fillCert(){
 function confetti(n){const e=['🎉','⭐','✨','🎊','💛'];for(let i=0;i<n;i++){const d=document.createElement('div');d.className='confetti';d.textContent=e[i%e.length];d.style.left=Math.random()*100+'vw';d.style.animationDelay=Math.random()*.8+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),3600)}}
 
 /* ===== live lesson (teacher-led) ===== */
-const apiURL=()=>{const u=window.SHEET_URL||'';return /^https:\/\/script\.google(usercontent)?\.com\//.test(u)?u:''};
+const apiURL=()=>{if(FBC())return 'firebase';const u=window.SHEET_URL||'';return /^https:\/\/script\.google(usercontent)?\.com\//.test(u)?u:''};
 function buildSeq(){const L=[{v:'lobby'}];STATIONS.forEach((st,i)=>{L.push({v:'map',st:i});pagesOf(i).forEach((x,p)=>L.push({v:'page',st:i,p}))});L.push({v:'cert'});L.push({v:'honor'});return L}
 const SEQ=buildSeq();
 let LIVE=null,LIVEMODE=false,lastI=-1,RES=[],TK='';
 function liveSt(){if(!LIVE)return null;let st=null;for(let i=0;i<=Math.min(LIVE.i,SEQ.length-1);i++){if(SEQ[i].st!=null)st=SEQ[i].st}const it=SEQ[Math.min(LIVE.i,SEQ.length-1)];if(it.v==='cert'||it.v==='honor')return 4;return st}
 async function pollState(){
   const u=apiURL();if(TEACHER)return;if(!u){$('conn').textContent='🔴 لا يوجد رابط Apps Script';return}
-  try{const j=await gsFetch('action=state&_='+Date.now());if(j&&j.ok){onState(j.state);$('conn').textContent='🟢 متصلة بالمعلمة'+(GSVIA==='site'?' (عبر الموقع)':GSVIA==='site2'?' (عبر الموقع 2)':GSVIA==='site3'?' (عبر الموقع 3)':'')}else $('conn').textContent='🔴 غير متصلة (خطأ في Apps Script)'}catch(e){if(!LIVE&&S.name&&$('s-lobby').classList.contains('on'))$('lobbyp').innerHTML='🔴 تعذّر الاتصال بالمعلمة… أحاول مرة أخرى تلقائيًا.<br>أبقي هذه الصفحة مفتوحة وأخبري معلمتك.';$('conn').textContent='🔴 غير متصلة بالمعلمة ['+GSERR.slice(-4).join(' | ').slice(0,150)+']';GSERR=[]}
+  try{const j=await gsFetch('action=state&_='+Date.now());if(j&&j.ok){onState(j.state);$('conn').textContent='🟢 متصلة بالمعلمة'+(GSVIA==='firebase'?' (Firebase)':GSVIA==='site'?' (عبر الموقع)':GSVIA==='site2'?' (عبر الموقع 2)':GSVIA==='site3'?' (عبر الموقع 3)':'')}else $('conn').textContent='🔴 غير متصلة (خطأ في Apps Script)'}catch(e){if(!LIVE&&S.name&&$('s-lobby').classList.contains('on'))$('lobbyp').innerHTML='🔴 تعذّر الاتصال بالمعلمة… أحاول مرة أخرى تلقائيًا.<br>أبقي هذه الصفحة مفتوحة وأخبري معلمتك.';$('conn').textContent='🔴 غير متصلة بالمعلمة ['+GSERR.slice(-4).join(' | ').slice(0,150)+']';GSERR=[]}
   setTimeout(pollState,LIVEMODE?3000:15000);
 }
 const curSes=()=>(LIVE&&LIVE.fb&&LIVE.fb._s)||'';
@@ -991,13 +1042,14 @@ async function tApi(params){
   if(!j.ok)throw new Error(j.error||'NET');return j;
 }
 async function tLogin(){
+  if(FBC()&&!$('temail').value.trim()){$('tkfb').textContent='اكتبي بريدك الإلكتروني أولًا';return}
   TK=($('tkey').value||'').trim()||TK;if(!TK)return;$('tkfb').textContent='جارٍ الدخول…';
   try{const j=await tApi({});try{localStorage.setItem('qc-tk',TK)}catch(e){}
     RES=j.results||[];LIVE=j.state;LIVEMODE=LIVE.mode==='live';document.body.classList.add('teacher');document.body.classList.toggle('live',LIVEMODE);
     if(LIVE.mode!=='live'){LIVE.mode='live';LIVEMODE=true;document.body.classList.add('live');tApi({action:'set',mode:'live',i:LIVE.i,fb:JSON.stringify(LIVE.fb||{})}).catch(()=>{})}
     $('conn').textContent='🟢 متصلة • وضع المعلمة';
     $('tlogin').classList.remove('on');S.name=S.name||'المعلمة';applyFb();lastI=LIVE.i;applyLive();setInterval(tPoll,5000);
-  }catch(e){$('tkfb').textContent={WRONG_KEY:'الرقم السري غير صحيح',NO_URL:'لم يُضبط رابط Apps Script في config.js'}[e.message]||'تعذّر الاتصال. هل حدّثتِ كود Apps Script ونشرتِ إصدارًا جديدًا؟';TK='';try{localStorage.removeItem('qc-tk')}catch(x){}}
+  }catch(e){$('tkfb').textContent={WRONG_KEY:FBC()?'البريد أو كلمة المرور غير صحيحة':'الرقم السري غير صحيح',NO_URL:'لم يُضبط رابط Apps Script في config.js'}[e.message]||'تعذّر الاتصال. هل حدّثتِ كود Apps Script ونشرتِ إصدارًا جديدًا؟';TK='';try{localStorage.removeItem('qc-tk')}catch(x){}}
 }
 async function tPoll(){try{const j=await tApi({});RES=j.results||[];renderTBar();renderDraw();if(SEQ[LIVE.i]&&SEQ[LIVE.i].v==='lobby')renderLobby()}catch(e){}}
 async function setLive(i,extra){
@@ -1051,6 +1103,7 @@ function renderTBar(){
   $('tmode').textContent=LIVE.mode==='live'?'🔓 تحويل لوضع ذاتي':'👩‍🏫 تفعيل قيادة الحصة';
 }
 
+if(FBC())document.body.classList.add('fb');
 /* ===== animated background ===== */
 (function(){
   const icons=['🤖','💻','⚙️','&lt;/&gt;','{ }','01','if','( )','🤖','10','x = 5','&lt;/&gt;','print','💡','{ }','🤖'];
@@ -1101,7 +1154,7 @@ function resetAll(btn){
 if(TEACHER){
   document.body.classList.add('teacher');
   try{TK=localStorage.getItem('qc-tk')||''}catch(e){}
-  $('tlogin').classList.add('on');if(TK){$('tkey').value='';tLogin()}
+  $('tlogin').classList.add('on');try{$('temail').value=localStorage.getItem('qc-tem')||''}catch(e){}if(TK&&(!FBC()||$('temail').value)){$('tkey').value='';tLogin()}
 }else{
   if(apiURL()){LIVEMODE=true;document.body.classList.add('live')}
   if(S.name){if(LIVEMODE){show('s-lobby');renderLobby()}else goMap();sync()}
