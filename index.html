@@ -356,7 +356,7 @@ body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .
   <button class="btn alt" id="tfb" onclick="tFb()">🔓 اعرضي التغذية الراجعة</button>
   <button class="btn sun" id="tnext" onclick="tNext()">التالي ⬅️</button>
   <span class="tsep"></span>
-  <button class="btn alt tsmall" id="tmode" onclick="tMode()"></button>
+  <button id="tmode" style="display:none"></button>
   <button class="btn alt tsmall" onclick="tReset(this)">⏮ من البداية</button>
   <button class="btn alt tsmall" onclick="toggleDraw()">📊 النتائج</button>
   <a class="btn alt tsmall" href="teacher.html" target="_blank" rel="noopener" title="تفتح في تبويب جديد">↗ اللوحة</a>
@@ -886,7 +886,7 @@ async function pollState(){
 }
 const curSes=()=>(LIVE&&LIVE.fb&&LIVE.fb._s)||'';
 function onState(st){
-  const was=LIVEMODE;LIVE=st;LIVEMODE=st.mode==='live';
+  const was=LIVEMODE;LIVE=st;LIVE.mode='live';LIVEMODE=true;
   /* new lesson session -> start fresh (keeps the name) */
   if(LIVEMODE&&!TEACHER&&S.name&&S.ses!==curSes()){freshStudent(curSes());return}
   document.body.classList.toggle('live',LIVEMODE);
@@ -946,6 +946,7 @@ async function tLogin(){
   TK=($('tkey').value||'').trim()||TK;if(!TK)return;$('tkfb').textContent='جارٍ الدخول…';
   try{const j=await tApi({});try{localStorage.setItem('qc-tk',TK)}catch(e){}
     RES=j.results||[];LIVE=j.state;LIVEMODE=LIVE.mode==='live';document.body.classList.add('teacher');document.body.classList.toggle('live',LIVEMODE);
+    if(LIVE.mode!=='live'){LIVE.mode='live';LIVEMODE=true;document.body.classList.add('live');tApi({action:'set',mode:'live',i:LIVE.i,fb:JSON.stringify(LIVE.fb||{})}).catch(()=>{})}
     $('tlogin').classList.remove('on');S.name=S.name||'المعلمة';applyFb();lastI=LIVE.i;applyLive();setInterval(tPoll,5000);
   }catch(e){$('tkfb').textContent={WRONG_KEY:'الرقم السري غير صحيح',NO_URL:'لم يُضبط رابط Apps Script في config.js'}[e.message]||'تعذّر الاتصال. هل حدّثتِ كود Apps Script ونشرتِ إصدارًا جديدًا؟';TK='';try{localStorage.removeItem('qc-tk')}catch(x){}}
 }
