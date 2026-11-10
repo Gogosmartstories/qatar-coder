@@ -220,6 +220,8 @@ body.teacher .wrap{height:calc(100vh - 68px)}
 #tbar #tnext{font-size:clamp(16px,1.3vw,20px);min-width:170px}
 #tbar .tsep{width:1px;height:36px;background:rgba(255,255,255,.3)}
 body.live:not(.teacher) .st-top>.btn.alt,body.live:not(.teacher) .reset{display:none}
+#ver{position:fixed;bottom:4px;right:10px;z-index:7;font-size:12px;color:rgba(255,255,255,.75);background:rgba(0,0,0,.25);border-radius:99px;padding:2px 10px;pointer-events:none}
+body.teacher #ver{bottom:72px}
 #tdraw{position:fixed;top:0;left:0;bottom:68px;width:min(460px,92vw);background:var(--card);z-index:9;transform:translateX(-105%);transition:transform .35s ease;box-shadow:8px 0 30px rgba(0,0,0,.35);display:flex;flex-direction:column;padding:14px;gap:10px}
 #tdraw.open{transform:none}
 #tdraw .dh{display:flex;align-items:center;gap:8px}
@@ -254,6 +256,7 @@ body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .
 </head>
 <body>
 <div class="bg" id="bg"></div>
+<div id="ver">الإصدار 10-11 • <span id="conn">⏳ جارٍ الاتصال…</span></div>
 <button id="mute" onclick="toggleMute()" title="الصوت" style="position:fixed;bottom:14px;left:14px;z-index:8;width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font-size:22px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25)">🔊</button>
 <div class="wrap">
 
@@ -880,8 +883,8 @@ const SEQ=buildSeq();
 let LIVE=null,LIVEMODE=false,lastI=-1,RES=[],TK='';
 function liveSt(){if(!LIVE)return null;let st=null;for(let i=0;i<=Math.min(LIVE.i,SEQ.length-1);i++){if(SEQ[i].st!=null)st=SEQ[i].st}const it=SEQ[Math.min(LIVE.i,SEQ.length-1)];if(it.v==='cert'||it.v==='honor')return 4;return st}
 async function pollState(){
-  const u=apiURL();if(!u||TEACHER)return;
-  try{const r=await fetch(u+'?action=state&_='+Date.now());const j=await r.json();if(j&&j.ok)onState(j.state)}catch(e){}
+  const u=apiURL();if(TEACHER)return;if(!u){$('conn').textContent='🔴 لا يوجد رابط Apps Script';return}
+  try{const r=await fetch(u+'?action=state&_='+Date.now());const j=await r.json();if(j&&j.ok){onState(j.state);$('conn').textContent='🟢 متصلة بالمعلمة'}else $('conn').textContent='🔴 غير متصلة (خطأ في Apps Script)'}catch(e){$('conn').textContent='🔴 غير متصلة بالمعلمة'}
   setTimeout(pollState,LIVEMODE?3000:15000);
 }
 const curSes=()=>(LIVE&&LIVE.fb&&LIVE.fb._s)||'';
@@ -947,6 +950,7 @@ async function tLogin(){
   try{const j=await tApi({});try{localStorage.setItem('qc-tk',TK)}catch(e){}
     RES=j.results||[];LIVE=j.state;LIVEMODE=LIVE.mode==='live';document.body.classList.add('teacher');document.body.classList.toggle('live',LIVEMODE);
     if(LIVE.mode!=='live'){LIVE.mode='live';LIVEMODE=true;document.body.classList.add('live');tApi({action:'set',mode:'live',i:LIVE.i,fb:JSON.stringify(LIVE.fb||{})}).catch(()=>{})}
+    $('conn').textContent='🟢 متصلة • وضع المعلمة';
     $('tlogin').classList.remove('on');S.name=S.name||'المعلمة';applyFb();lastI=LIVE.i;applyLive();setInterval(tPoll,5000);
   }catch(e){$('tkfb').textContent={WRONG_KEY:'الرقم السري غير صحيح',NO_URL:'لم يُضبط رابط Apps Script في config.js'}[e.message]||'تعذّر الاتصال. هل حدّثتِ كود Apps Script ونشرتِ إصدارًا جديدًا؟';TK='';try{localStorage.removeItem('qc-tk')}catch(x){}}
 }
