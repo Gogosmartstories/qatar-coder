@@ -913,6 +913,7 @@ function applyLive(){
 }
 function renderLobby(){
   if(TEACHER){const U=uniqRes();$('lobbyt').textContent='👥 قاعة الانتظار';$('lobbyp').innerHTML=`انضمت <b>${U.length}</b> طالبة حتى الآن. عندما تكتمل الطالبات اضغطي <b>«▶️ ابدئي الرحلة»</b>.`;
+    if(LIVE&&LIVE.mode==='self')$('lobbyp').innerHTML=`<div class="warn" style="font-size:1.05em">⚠️ <b>قيادة الحصة متوقفة</b> (الوضع الذاتي مفعّل)، لذلك الطالبات لا يدخلن قاعة الانتظار ولا يتبعن شاشتك.</div><button class="btn sun" style="margin-top:10px" onclick="tMode()">👩‍🏫 تفعيل قيادة الحصة الآن</button>`;
     $('lobbynames').innerHTML=U.map(o=>`<span>${esc(o.n)}</span>`).join('')}
   else{document.querySelectorAll('.lname').forEach(e=>e.textContent=S.name);$('lobbyt').textContent=`أهلًا ${S.name}! 👋`;$('lobbyp').innerHTML='⏳ انتظري قليلًا… ستبدأ المعلمة الرحلة بعد لحظات.<br>أبقي هذه الصفحة مفتوحة.';$('lobbynames').innerHTML=''}
 }
@@ -963,10 +964,10 @@ function curWork(){const it=SEQ[LIVE.i];if(!it||it.v!=='page')return null;const 
 function tNext(){const w=curWork();LIVE.fb=LIVE.fb||{};if(w)LIVE.fb[w]=true;if(LIVE.i<SEQ.length-1)setLive(LIVE.i+1)}
 function tPrev(){if(LIVE.i>0)setLive(LIVE.i-1)}
 function tFb(){const w=curWork();if(!w)return;LIVE.fb=LIVE.fb||{};LIVE.fb[w]=true;setLive(LIVE.i)}
-function tMode(){const m=LIVE.mode==='live'?'self':'live';LIVE.mode=m;LIVEMODE=m==='live';document.body.classList.toggle('live',LIVEMODE);setLive(LIVE.i,{mode:m})}
+function tMode(){const m=LIVE.mode==='live'?'self':'live';LIVE.mode=m;LIVEMODE=m==='live';document.body.classList.toggle('live',LIVEMODE);setLive(LIVE.i,{mode:m});if(SEQ[LIVE.i].v==='lobby')renderLobby()}
 function tReset(btn){
   if(!btn.dataset.sure){btn.dataset.sure=1;btn.textContent='⚠️ متأكدة؟ اضغطي مجددًا';setTimeout(()=>{delete btn.dataset.sure;btn.textContent='⏮ من البداية'},4000);return}
-  delete btn.dataset.sure;btn.textContent='⏮ من البداية';LIVE.fb={_s:Date.now().toString(36)};S={name:'المعلمة',unlocked:0,done:[],pts:0,ts:{}};try{localStorage.removeItem(KEY)}catch(e){}setLive(0);
+  delete btn.dataset.sure;btn.textContent='⏮ من البداية';LIVE.fb={_s:Date.now().toString(36)};S={name:'المعلمة',unlocked:0,done:[],pts:0,ts:{}};try{localStorage.removeItem(KEY)}catch(e){}LIVE.mode='live';LIVEMODE=true;document.body.classList.add('live');setLive(0,{mode:'live'});
 }
 function toggleDraw(){const d=$('tdraw');d.classList.toggle('open');sfx.tick();if(d.classList.contains('open'))renderDraw()}
 function uniqRes(){const M={},ss=curSes();RES.filter(o=>!ss||String(o.sid).indexOf(ss+'z')===0).forEach(o=>{const k=o.n.trim();if(!M[k]||o.t>=M[k].t)M[k]=o});return Object.values(M).sort((a,b)=>b.p-a.p||b.d-a.d||a.t-b.t)}
