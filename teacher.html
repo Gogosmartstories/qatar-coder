@@ -120,15 +120,15 @@ const normName=n=>n.trim().replace(/\s+/g,' ').replace(/[أإآ]/g,'ا').replace
 let R={};try{R=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
 let SRV=[],TK='',POLL=null;try{TK=localStorage.getItem('qc-tk')||''}catch(e){}
 /* talk to Google Apps Script: first through our own site (/api/gs, works on school networks), then directly */
-let GSVIA=null;
+let GSVIA=null,GSERR=[];
 async function gsFetch(params,opts){
   const u=window.SHEET_URL||'';
-  const direct=u+(params?'?'+params:''),prox='/api/gs?u='+encodeURIComponent(u)+(params?'&'+params:'');
+  const m=u.match(/\/s\/([A-Za-z0-9_-]+)\/exec/),direct=u+(params?'?'+params:''),prox='/api/gs?id='+(m?m[1]:'')+(params?'&'+params:'');
   const order=GSVIA==='direct'?[direct,prox]:GSVIA==='proxy'?[prox,direct]:(location.protocol!=='file:'?[prox,direct]:[direct]);
   let last;
   for(const url of order){
     try{const r=await fetch(url,opts);if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();GSVIA=url===prox?'proxy':'direct';return j}
-    catch(e){last=e}
+    catch(e){last=e;GSERR.push((url===prox?'site':'google')+': '+(e&&e.message||e))}
   }
   throw last||new Error('NET');
 }
