@@ -256,7 +256,7 @@ body.teacher .st-top>.btn.alt,body.teacher .mapbottom .btn,body.teacher #s-end .
 </head>
 <body>
 <div class="bg" id="bg"></div>
-<div id="ver">الإصدار 10-11 • <span id="conn">⏳ جارٍ الاتصال…</span></div>
+<div id="ver">الإصدار 10-11ب • <span id="conn">⏳ جارٍ الاتصال…</span></div>
 <button id="mute" onclick="toggleMute()" title="الصوت" style="position:fixed;bottom:14px;left:14px;z-index:8;width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.9);font-size:22px;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25)">🔊</button>
 <div class="wrap">
 
@@ -543,6 +543,19 @@ const KEY=TEACHER?'qatar-coder-teacher':'qatar-coder-v3';
 let S={name:'',unlocked:0,done:[],pts:0,ts:{}};
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.ts)S=s;}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}sync()}
+/* talk to Google Apps Script: first through our own site (/api/gs, works on school networks), then directly */
+let GSVIA=null;
+async function gsFetch(params,opts){
+  const u=window.SHEET_URL||'';
+  const direct=u+(params?'?'+params:''),prox='/api/gs?u='+encodeURIComponent(u)+(params?'&'+params:'');
+  const order=GSVIA==='direct'?[direct,prox]:GSVIA==='proxy'?[prox,direct]:(location.protocol!=='file:'?[prox,direct]:[direct]);
+  let last;
+  for(const url of order){
+    try{const r=await fetch(url,opts);if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();GSVIA=url===prox?'proxy':'direct';return j}
+    catch(e){last=e}
+  }
+  throw last||new Error('NET');
+}
 /* ===== live sync to teacher board (works when hosted on Vercel) ===== */
 let syncT=null;
 function sync(){
@@ -551,10 +564,10 @@ function sync(){
   clearTimeout(syncT);
   syncT=setTimeout(()=>{
     const API=window.SHEET_URL||'';if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(API))return;
-    try{fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    try{gsFetch('',{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
       body:JSON.stringify({sid:S.sid,n:S.name,p:S.pts,d:S.done.length,a1:(S.ts['0-1']||{}).ans||'',a2:(S.ts['1-0']||{}).ans||'',
         k:Object.keys(S.ts).filter(id=>S.ts[id].ok).concat(Object.keys(S.ts).filter(id=>S.ts[id].ready).map(id=>id+'w')).join(',')})})
-      .then(r=>r.json()).then(j=>{const d=$('live');if(d)d.style.display=j&&j.ok?'inline-block':'none'}).catch(()=>{})}catch(e){}
+      .then(j=>{const d=$('live');if(d)d.style.display=j&&j.ok?'inline-block':'none'}).catch(()=>{})}catch(e){}
   },600);
 }
 const $=id=>document.getElementById(id);
@@ -884,7 +897,7 @@ let LIVE=null,LIVEMODE=false,lastI=-1,RES=[],TK='';
 function liveSt(){if(!LIVE)return null;let st=null;for(let i=0;i<=Math.min(LIVE.i,SEQ.length-1);i++){if(SEQ[i].st!=null)st=SEQ[i].st}const it=SEQ[Math.min(LIVE.i,SEQ.length-1)];if(it.v==='cert'||it.v==='honor')return 4;return st}
 async function pollState(){
   const u=apiURL();if(TEACHER)return;if(!u){$('conn').textContent='🔴 لا يوجد رابط Apps Script';return}
-  try{const r=await fetch(u+'?action=state&_='+Date.now());const j=await r.json();if(j&&j.ok){onState(j.state);$('conn').textContent='🟢 متصلة بالمعلمة'}else $('conn').textContent='🔴 غير متصلة (خطأ في Apps Script)'}catch(e){$('conn').textContent='🔴 غير متصلة بالمعلمة'}
+  try{const j=await gsFetch('action=state&_='+Date.now());if(j&&j.ok){onState(j.state);$('conn').textContent='🟢 متصلة بالمعلمة'+(GSVIA==='proxy'?' (عبر الموقع)':'')}else $('conn').textContent='🔴 غير متصلة (خطأ في Apps Script)'}catch(e){$('conn').textContent='🔴 غير متصلة بالمعلمة'}
   setTimeout(pollState,LIVEMODE?3000:15000);
 }
 const curSes=()=>(LIVE&&LIVE.fb&&LIVE.fb._s)||'';
@@ -942,7 +955,7 @@ function celebrate(){
 async function tApi(params){
   const u=apiURL();if(!u)throw new Error('NO_URL');
   const q=Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
-  const r=await fetch(u+'?key='+encodeURIComponent(TK)+'&'+q+'&_='+Date.now());const j=await r.json();
+  const j=await gsFetch('key='+encodeURIComponent(TK)+'&'+q+'&_='+Date.now());
   if(!j.ok)throw new Error(j.error||'NET');return j;
 }
 async function tLogin(){

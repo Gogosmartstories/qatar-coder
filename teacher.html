@@ -15,7 +15,7 @@ h1,h2,h3{font-family:'Lalezar',sans-serif;font-weight:400;margin:0}
 .top{display:flex;justify-content:space-between;align-items:center;color:#fff;flex-wrap:wrap;gap:10px}
 .top h1{font-size:30px}
 .card{background:var(--card);border-radius:20px;padding:16px;margin-top:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.grid{display:grid;grid-template-columns:1.3fr 1fr;gap:14px}
+.grid{display:grid;grid-template-columns:1fr;gap:14px;max-width:560px}
 @media(max-width:800px){.grid{grid-template-columns:1fr}}
 textarea{font:inherit;width:100%;min-height:120px;border-radius:14px;border:2px solid var(--sand2);padding:10px;font-size:14px}
 .btn{font:inherit;font-weight:800;font-size:15px;border:0;border-radius:12px;padding:10px 16px;cursor:pointer;background:var(--sea);color:#fff;box-shadow:0 4px 0 var(--sea2)}
@@ -68,19 +68,10 @@ tr.top1 td{background:#fff3c4} tr.top2 td{background:#eef1f4} tr.top3 td{backgro
 <div class="wrap">
   <div class="top">
     <div><h1>👩‍🏫 لوحة المعلمة</h1><div style="opacity:.8">رحلة المبرمجة في قطر • خطوات حل المشكلات • الصف التاسع</div></div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn" style="font-size:18px;text-decoration:none;background:#8a1538;box-shadow:0 4px 0 #5a1230" href="index.html#teacher" target="_blank">🎮 قيادة الحصة</a><button class="btn sun" style="font-size:18px" onclick="podium()">🏆 شاشة التكريم</button></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn" style="font-size:18px;text-decoration:none;background:#8a1538;box-shadow:0 4px 0 #5a1230" href="index.html#teacher" target="_blank" rel="noopener" title="تفتح في تبويب جديد">🎮 قيادة الحصة</a><button class="btn sun" style="font-size:18px" onclick="podium()">🏆 شاشة التكريم</button></div>
   </div>
 
   <div class="grid">
-    <div class="card">
-      <h3 style="color:var(--sea);font-size:22px">📥 إضافة نتائج يدويًا (احتياطي)</h3>
-      <p style="margin:6px 0;color:var(--muted);line-height:1.7">النتائج تصل تلقائيًا بعد الدخول. إذا انقطع اتصال طالبة، انسخي رسائل الطالبات من محادثة الحصة (رسالة واحدة أو المحادثة كاملة) والصقيها هنا. اللوحة تلتقط النتائج تلقائيًا، وإذا أرسلت الطالبة أكثر من مرة تُحفظ أحدث نتيجة لها.</p>
-      <textarea id="paste" placeholder="الصقي هنا… مثال: سارة | 75 نقطة | 3/4 محطات | #QC:..."></textarea>
-      <div class="row">
-        <button class="btn" onclick="addFromPaste()">➕ إضافة النتائج</button>
-        <span class="msg" id="msg"></span>
-      </div>
-    </div>
     <div class="card">
       <h3 style="color:var(--sea);font-size:22px">🔐 دخول المعلمة</h3>
       <div id="login">
@@ -128,11 +119,23 @@ const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const normName=n=>n.trim().replace(/\s+/g,' ').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي');
 let R={};try{R=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){}
 let SRV=[],TK='',POLL=null;try{TK=localStorage.getItem('qc-tk')||''}catch(e){}
+/* talk to Google Apps Script: first through our own site (/api/gs, works on school networks), then directly */
+let GSVIA=null;
+async function gsFetch(params,opts){
+  const u=window.SHEET_URL||'';
+  const direct=u+(params?'?'+params:''),prox='/api/gs?u='+encodeURIComponent(u)+(params?'&'+params:'');
+  const order=GSVIA==='direct'?[direct,prox]:GSVIA==='proxy'?[prox,direct]:(location.protocol!=='file:'?[prox,direct]:[direct]);
+  let last;
+  for(const url of order){
+    try{const r=await fetch(url,opts);if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();GSVIA=url===prox?'proxy':'direct';return j}
+    catch(e){last=e}
+  }
+  throw last||new Error('NET');
+}
 async function fetchResults(method){
   const API=window.SHEET_URL||'';
   if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(API))throw new Error('NO_URL');
-  const r=await fetch(API+'?key='+encodeURIComponent(TK)+(method==='DELETE'?'&action=clear':'')+'&_='+Date.now());
-  let j={};try{j=await r.json()}catch(e){throw new Error('NET')}
+  let j={};try{j=await gsFetch('key='+encodeURIComponent(TK)+(method==='DELETE'?'&action=clear':'')+'&_='+Date.now())}catch(e){throw new Error('NET')}
   if(!j.ok)throw new Error(j.error||'NET');
   return j;
 }
