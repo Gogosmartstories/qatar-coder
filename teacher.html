@@ -124,16 +124,26 @@ let GSVIA=null,GSERR=[];
 async function gsFetch(params,opts){
   const u=window.SHEET_URL||'',m=u.match(/\/s\/([A-Za-z0-9_-]+)\/exec/),id=m?m[1]:'';
   opts=opts||{};
+  const asJson=async r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()};
   const routes={
-    site:()=>fetch('/api/gs?id='+id+(params?'&'+params:''),opts),
-    site2:()=>fetch('/d',{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({_q:'id='+id+(params?'&'+params:''),_m:opts.method==='POST'?'POST':'GET',_b:opts.body||''})}),
-    google:()=>fetch(u+(params?'?'+params:''),opts)
+    site:()=>fetch('/api/gs?id='+id+(params?'&'+params:''),opts).then(asJson),
+    site2:()=>fetch('/d',{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({_q:'id='+id+(params?'&'+params:''),_m:opts.method==='POST'?'POST':'GET',_b:opts.body||''})}).then(asJson),
+    site3:()=>new Promise((res,rej)=>{
+      const cb='gscb'+Date.now().toString(36)+Math.floor(Math.random()*1e6),sc=document.createElement('script');
+      let data='';if(opts.method==='POST'){const b=new TextEncoder().encode(opts.body||'{}');let bin='';b.forEach(x=>bin+=String.fromCharCode(x));data='&data='+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+      const done=()=>{clearTimeout(t);try{delete window[cb]}catch(e){window[cb]=undefined}sc.remove()};
+      const t=setTimeout(()=>{done();rej(new Error('timeout'))},15000);
+      window[cb]=d=>{done();res(d)};
+      sc.onerror=()=>{done();rej(new Error('script blocked'))};
+      sc.src='/s.js?id='+id+(params?'&'+params:'')+data+'&cb='+cb;document.head.appendChild(sc);
+    }),
+    google:()=>fetch(u+(params?'?'+params:''),opts).then(asJson)
   };
-  let order=location.protocol==='file:'?['google']:['site','site2','google'];
+  let order=location.protocol==='file:'?['google']:['site','site2','site3','google'];
   if(GSVIA)order=[GSVIA].concat(order.filter(x=>x!==GSVIA));
   let last;
   for(const k of order){
-    try{const r=await routes[k]();if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();GSVIA=k;return j}
+    try{const j=await routes[k]();GSVIA=k;return j}
     catch(e){last=e;GSERR.push(k+': '+(e&&e.message||e))}
   }
   throw last||new Error('NET');
